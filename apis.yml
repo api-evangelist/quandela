@@ -1,0 +1,96 @@
+aid: quandela
+name: Quandela
+description: >-
+  Quandela is a Paris-region (Massy, France) photonic quantum computing
+  company building modular, scalable, and energy-efficient quantum systems
+  driven by deterministic single-photon sources. Its hardware lineup includes
+  Ascella (its first deployed cloud-accessible system), Belenos (a
+  12-qubit second-generation machine), Canopus (its latest state-of-the-art
+  system), and Mosaiq (its flagship prototyping platform), alongside
+  Prometheus single-photon sources and the Entropy quantum random number
+  generator. Quandela develops Perceval, an open-source Python framework for
+  programming photonic quantum computers, distributed via PyPI as
+  perceval-quandela, and operates a cloud platform at cloud.quandela.com
+  where users authenticate with a token and submit jobs to simulators and
+  QPUs (e.g. "sim:altair", "qpu:altair") through Perceval's RemoteProcessor.
+  The company also runs a Quantum Acceleration Program for enterprise
+  pilots in cybersecurity, pharma, chemistry, logistics, finance, energy,
+  and aerospace. There is no public REST/HTTP OpenAPI specification — the
+  cloud surface is abstracted entirely behind the Perceval Python SDK and
+  its companion perceval-interop bridges to Qiskit, QuTiP, cQASM, and
+  myQLM.
+type: Index
+position: Provider
+access: 3rd-Party
+image: https://kinlane-productions.s3.amazonaws.com/apis-json/apis-json-logo.jpg
+tags:
+  - Quantum Computing
+  - Photonic Quantum
+  - Photonics
+  - Single Photon Sources
+  - Quantum Hardware
+  - Quantum Cloud
+  - QPU
+  - Perceval
+  - Python SDK
+  - Quantum Random Number Generation
+  - Quantum Simulation
+  - Open Source
+  - France
+url: https://raw.githubusercontent.com/api-evangelist/quandela/refs/heads/main/apis.yml
+created: '2026-05-25'
+modified: '2026-05-25'
+specificationVersion: '0.20'
+apis: []
+common:
+  - type: Website
+    url: https://www.quandela.com
+  - type: Cloud
+    url: https://cloud.quandela.com
+  - type: Hub
+    url: https://hub.quandela.com
+  - type: Perceval
+    url: https://perceval.quandela.net
+  - type: Documentation
+    url: https://perceval.quandela.net/docs
+  - type: Tutorials
+    url: https://perceval.quandela.net/docs/v0.13/notebooks/Tutorial.html
+  - type: PyPI
+    url: https://pypi.org/project/perceval-quandela/
+  - type: GitHub
+    url: https://github.com/Quandela
+  - type: GitHubRepository
+    url: https://github.com/Quandela/Perceval
+  - type: SDK
+    url: https://github.com/Quandela/Perceval
+  - type: Interop
+    url: https://github.com/Quandela/Perceval_Interop
+  - type: Training
+    url: https://training.quandela.com
+  - type: Community
+    url: https://community.quandela.com
+  - type: Products
+    url: https://www.quandela.com/products-and-services/
+  - type: CloudProduct
+    url: https://www.quandela.com/products-and-services/cloud/
+  - type: PercevalProduct
+    url: https://www.quandela.com/products-and-services/perceval/
+  - type: AccelerationProgram
+    url: https://www.quandela.com/products-and-services/quantum-acceleration-program/
+  - type: Blog
+    url: https://www.quandela.com/resources/blog/
+  - type: Careers
+    url: https://www.quandela.com/about-us/careers/
+  - type: Contact
+    url: https://www.quandela.com/about-us/contact-us/
+  - type: LinkedIn
+    url: https://www.linkedin.com/company/quandela
+  - type: Twitter
+    url: https://twitter.com/Quandela_Quantum
+  - type: YouTube
+    url: https://www.youtube.com/@quandela
+  - type: Discord
+    url: https://discord.gg/quandela
+maintainers:
+  - FN: Kin Lane
+    email: kin@apievangelist.com
