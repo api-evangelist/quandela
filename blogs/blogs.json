@@ -3,19 +3,12 @@
   "feeds": [
     {
       "source": "https://www.quandela.com/resources/blog/",
-      "feed_url": "https://www.quandela.com/resources/blog/",
-      "title": "",
+      "feed_url": "",
       "saved": 0,
-      "method": "none"
-    },
-    {
-      "source": "https://www.quandela.com/products-and-services/quantum-acceleration-program/",
-      "feed_url": "https://www.quandela.com/products-and-services/quantum-acceleration-program/",
-      "title": "",
-      "saved": 0,
-      "method": "none"
+      "method": "agent-scrape"
     }
   ],
-  "post_count": 0,
-  "fetched": "2026-06-14T20:42:17Z"
+  "post_count": 1,
+  "fetched": "2026-06-27T13:03:40Z",
+  "agent_pulled": "2026-06-27"
 }

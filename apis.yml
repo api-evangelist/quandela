@@ -61,7 +61,7 @@ common:
     url: https://github.com/Quandela
   - type: GitHubRepository
     url: https://github.com/Quandela/Perceval
-  - type: SDK
+  - type: SDKs
     url: https://github.com/Quandela/Perceval
   - type: Interop
     url: https://github.com/Quandela/Perceval_Interop
