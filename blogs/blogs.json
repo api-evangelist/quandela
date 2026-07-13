@@ -2,13 +2,14 @@
   "repo": "quandela",
   "feeds": [
     {
-      "source": "https://www.quandela.com/resources/blog/",
-      "feed_url": "",
+      "source": "https://www.quandela.com/products-and-services/quantum-acceleration-program/",
+      "feed_url": "https://www.quandela.com/products-and-services/quantum-acceleration-program/",
+      "title": "",
       "saved": 0,
-      "method": "agent-scrape"
+      "method": "none"
     }
   ],
   "post_count": 1,
-  "fetched": "2026-06-27T13:03:40Z",
-  "agent_pulled": "2026-06-27"
+  "fetched": "2026-07-11T11:50:51Z",
+  "agent_pulled": "2026-07-04"
 }
