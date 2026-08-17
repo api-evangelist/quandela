@@ -1,0 +1,246 @@
+generated: '2026-08-17'
+method: derived
+source: >-
+  openapi/_original/quandela-cloud-openapi.json (components.schemas.HTTPError /
+  ValidationError, and the 4xx response descriptions on 59 operations) plus live
+  anonymous probes of https://api.cloud.quandela.com on 2026-08-17
+format: vendor-json
+rfc9457: false
+note: >-
+  Quandela does NOT use RFC 9457 problem+json. Every error is
+  `application/json` shaped as the `HTTPError` schema — a flat
+  `{detail, error}` object with no `type`, `title` or `instance` member and no
+  stable machine-readable error code. `error` carries a human-readable English
+  sentence and `detail` is a free-form object (populated only for 400/422
+  validation failures, where it nests location -> field -> [messages]). An
+  agent must therefore branch on HTTP status plus string matching, which is the
+  single largest error-semantics gap on this API.
+envelope:
+  schema: HTTPError
+  content_type: application/json
+  fields:
+    - name: error
+      type: string
+      description: Human-readable message. The only discriminator available for same-status failures.
+    - name: detail
+      type: object
+      description: >-
+        Free-form. Empty object `{}` on auth/not-found errors; on 400/422 it is
+        the ValidationError shape `{"<location>": {"<field_name>": ["message"]}}`.
+  observed_examples:
+    - probe: GET https://api.cloud.quandela.com/api/platforms
+      status: 401
+      body: '{"detail":{},"error":"Authentication and authorization failed: token not found"}'
+    - probe: GET https://api.cloud.quandela.com/api/jobs/availability
+      status: 401
+      body: '{"detail":{},"error":"Invalid or expired job token"}'
+    - probe: GET https://api.cloud.quandela.com/api/pricing
+      status: 404
+      body: >-
+        {"detail":{},"error":"The requested URL was not found on the server. If
+        you entered the URL manually please check your spelling and try again."}
+    - probe: 'GET https://api.cloud.quandela.com/qt/qrng/ints?count=4&type=int8'
+      status: 400
+      body: '{"detail":{"query":{"type":["Must be one of: uint8, uint16, uint32, uint64."]}},"error":"Bad Request"}'
+statuses:
+  - status: 400
+    operations: 39
+    class: InvalidDataError / ValidationError
+  - status: 401
+    operations: 55
+    class: AuthenticationError
+  - status: 403
+    operations: 43
+    class: PermissionDenied
+  - status: 404
+    operations: 28
+    class: NotFound
+  - status: 422
+    operations: 34
+    class: ValidationError
+problems:
+  - status: 401
+    message: 'Authentication and authorization failed: token not found'
+    class: AuthenticationError
+    meaning: No bearer credential was presented on an account-scoped endpoint.
+    remediation: 'Send `Authorization: Bearer <account access token>` from account.quandela.com.'
+    method: probed
+  - status: 401
+    message: Invalid or expired job token
+    class: AuthenticationError
+    meaning: The Cloud Job Token presented to a job/Quantum-Toolbox endpoint is invalid, revoked or expired.
+    remediation: Reopen or regenerate the job token via POST /api/tokens/reopen or POST /api/tokens.
+    method: probed
+  - status: 401
+    message: 'Authentication failed: explorer tokens are not allowed'
+    class: AuthenticationError
+    meaning: The token tier (explorer) is not permitted on this endpoint.
+    remediation: Upgrade the offer or use a non-explorer token.
+    source_operation: openapi/quandela-perceval-job-openapi.yml#post_api_jobs
+  - status: 401
+    message: Invalid user
+    class: AuthenticationError
+    meaning: The user account bound to the token is deactivated.
+    remediation: Contact Quandela support.
+    source_operation: openapi/quandela-perceval-job-openapi.yml#post_api_jobs
+  - status: 401
+    message: Not enough credits
+    class: QuotaExhausted
+    meaning: >-
+      Credit balance is insufficient to admit the job. NOTE the status: Quandela
+      returns 401, not 402 or 429, for a billing/quota condition.
+    remediation: Top up credits or reduce max_shots / max_duration.
+    source_operation: openapi/quandela-perceval-job-openapi.yml#post_api_jobs
+  - status: 401
+    message: 'Not enough credits: all remaining credits are reserved by waiting or running jobs'
+    class: QuotaExhausted
+    meaning: Credits exist but are reserved by queued/running jobs.
+    remediation: Cancel a waiting job (POST /api/jobs/{job_id}/cancel) or wait for completion.
+    source_operation: openapi/quandela-perceval-job-openapi.yml#post_api_jobs
+  - status: 401
+    message: Not enough {platform_type} time left
+    class: QuotaExhausted
+    meaning: Enterprise-offer platform time budget is exhausted.
+    remediation: Contact Quandela to extend the offer.
+    source_operation: openapi/quandela-perceval-job-openapi.yml#post_api_jobs
+  - status: 400
+    message: Cannot create more than {MAX_WAITING_JOBS} jobs
+    class: ConcurrencyLimit
+    meaning: Global or offer-specific ceiling on simultaneously waiting jobs.
+    remediation: Wait for or cancel a queued job before submitting. See rate-limits/quandela-rate-limits.yml.
+    source_operation: openapi/quandela-perceval-job-openapi.yml#post_api_jobs
+  - status: 400
+    message: Max duration too large, exceeding 864000
+    class: RequestLimit
+    meaning: max_duration must not exceed 864000 seconds (10 days).
+    remediation: Lower max_duration.
+    source_operation: openapi/quandela-perceval-job-openapi.yml#post_api_jobs
+  - status: 400
+    message: Max_duration {value}(s) exceeds the platform limit of {limit}(s)
+    class: RequestLimit
+    meaning: Per-platform max_duration ceiling exceeded.
+    remediation: Lower max_duration or choose another platform.
+    source_operation: openapi/quandela-perceval-job-openapi.yml#post_api_jobs
+  - status: 400
+    message: Max shots must less than or equal to {shots_limit}
+    class: RequestLimit
+    meaning: Per-platform shot ceiling exceeded.
+    remediation: Lower max_shots.
+    source_operation: openapi/quandela-perceval-job-openapi.yml#post_api_jobs
+  - status: 400
+    message: Create job disabled, Platform in {status} status
+    class: PlatformUnavailable
+    meaning: >-
+      Target platform is decommissioned, retired, in maintenance or
+      unreachable. Check GET /api/platforms/public first.
+    remediation: Select an available platform; poll the public platform status endpoint.
+    source_operation: openapi/quandela-perceval-job-openapi.yml#post_api_jobs
+  - status: 400
+    message: "Command '{command}' is not available on platform '{platform_name}'"
+    class: InvalidDataError
+    meaning: The requested Perceval command is unsupported by the selected platform.
+    remediation: Choose a supporting platform.
+    source_operation: openapi/quandela-perceval-job-openapi.yml#post_api_jobs
+  - status: 400
+    message: "Quantum Toolbox command '{command}' is not defined"
+    class: InvalidDataError
+    meaning: Unknown Quantum Toolbox algorithm name.
+    remediation: Use one of the documented qt/ algorithms.
+    source_operation: openapi/quandela-quantum-toolbox-openapi.yml#post_qt_customvqe
+  - status: 400
+    message: Require platform_id or platform_name
+    class: InvalidDataError
+    meaning: Job creation needs one platform identifier.
+    remediation: Supply platform_name (e.g. "qpu:belenos") or platform_id.
+    source_operation: openapi/quandela-perceval-job-openapi.yml#post_api_jobs
+  - status: 400
+    message: 'Invalid payload, expected a json object'
+    class: InvalidDataError
+    meaning: Request body was not a JSON object.
+    remediation: Send application/json object body.
+    source_operation: openapi/quandela-perceval-job-openapi.yml#post_api_jobs
+  - status: 400
+    message: 'process_id is existed and assigned to another user job'
+    class: Conflict
+    meaning: >-
+      The caller-supplied process_id is already bound to another user's job.
+      This is the closest thing to a de-duplication key on the API, but it
+      returns 400 rather than replaying the original response — it is NOT
+      idempotency.
+    remediation: Use a fresh process_id.
+    source_operation: openapi/quandela-perceval-job-openapi.yml#post_api_jobs
+  - status: 400
+    message: "Label already exists: {label}"
+    class: Conflict
+    meaning: Job-token label collision.
+    remediation: Choose a unique label.
+    source_operation: openapi/quandela-job-token-openapi.yml#post_api_tokens
+  - status: 400
+    message: "Can't not revoke"
+    class: InvalidState
+    meaning: Token cannot be revoked in its current state.
+    source_operation: openapi/quandela-job-token-openapi.yml#post_api_tokens_revoke
+  - status: 400
+    message: Can not cancel job
+    class: InvalidState
+    meaning: Job is not in a cancellable state.
+    source_operation: openapi/quandela-perceval-job-openapi.yml#post_api_jobs_by_job_id_cancel
+  - status: 403
+    message: Cannot have more than {MAX_QT_JOBS} running Quantum Toolbox jobs
+    class: ConcurrencyLimit
+    meaning: Ceiling on concurrently running Quantum Toolbox jobs.
+    remediation: Wait for a running QT job to finish. See rate-limits/quandela-rate-limits.yml.
+    source_operation: openapi/quandela-quantum-toolbox-openapi.yml#post_qt_chemistryvqe
+  - status: 403
+    message: No permission to use platform {platform_name}
+    class: PermissionDenied
+    meaning: The offer does not include this platform.
+    source_operation: openapi/quandela-perceval-job-openapi.yml#post_api_jobs
+  - status: 403
+    message: No permission to use algorithm {command}
+    class: PermissionDenied
+    meaning: The offer does not include this algorithm.
+    source_operation: openapi/quandela-quantum-toolbox-openapi.yml#post_qt_customvqe
+  - status: 403
+    message: 'Platform {name} is locked, please upgrade your offer to use it'
+    class: PermissionDenied
+    meaning: Platform gated behind a higher commercial tier.
+    source_operation: openapi/quandela-perceval-job-openapi.yml#post_api_jobs
+  - status: 403
+    message: You do not have permission to delete this token
+    class: PermissionDenied
+    source_operation: openapi/quandela-job-token-openapi.yml#post_api_tokens_delete_by_ids
+  - status: 404
+    message: 'Not found job: {job_id}'
+    class: NotFound
+    source_operation: openapi/quandela-perceval-job-openapi.yml#get_api_jobs_by_job_id_status
+  - status: 404
+    message: Platform not found
+    class: NotFound
+    source_operation: openapi/quandela-perceval-job-openapi.yml#post_api_jobs
+  - status: 404
+    message: Entropy Pool empty
+    class: ResourceExhausted
+    meaning: >-
+      The Entropy QRNG entropy pool is momentarily drained. Distinctive to the
+      QRNG surface; retry after a short delay.
+    remediation: Retry with backoff or request fewer bytes.
+    source_operation: openapi/quandela-qrng-openapi.yml#get_qt_qrng_bytes
+  - status: 422
+    message: Missing data for required field.
+    class: ValidationError
+    meaning: >-
+      Marshmallow-style field validation. `detail` nests
+      location -> field -> [messages].
+    remediation: Read detail.<location>.<field> for the specific failure.
+    method: probed
+gaps:
+  - No machine-readable error code member; agents must string-match on `error`.
+  - No RFC 9457 `application/problem+json` representation.
+  - >-
+    Quota and billing exhaustion ("Not enough credits") is signalled as 401,
+    conflating authentication failure with payment/quota failure — an agent
+    that retries 401 by refreshing its token will loop forever.
+  - No 429 status anywhere in the spec; concurrency ceilings surface as 400/403.
+  - No `Retry-After` header defined on any response.
+  - No 5xx responses declared on any of the 59 operations.

@@ -1,0 +1,74 @@
+openapi: 3.0.3
+info:
+  title: Quandela Cloud API — Platform
+  version: v2.8.0-rc4
+  description: "\nThis is the official API documentation.\n\n## Overview\n\nThis API provides access to various features and services.  \n\n## Authentication\n\nAll endpoints require an access token generated\
+    \ by the authorization server.\n\nInclude the token in the request headers:\n\n```http\nAuthorization: Bearer YOUR_ACCESS_TOKEN\n```\nEnsure the token is valid and not expired.\n\n"
+  contact:
+    name: Support
+    url: https://www.quandela.com/about-us/contact-us/
+  termsOfService: https://www.quandela.com/legal-terms/
+servers:
+- url: https://api.cloud.quandela.com/
+tags:
+- name: Platform
+  description: Service root, health check and specification endpoints
+paths:
+  /:
+    get:
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: {}
+          description: Successful response
+      summary: Home
+      operationId: get_root
+      tags:
+      - Platform
+  /health:
+    get:
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: {}
+          description: Successful response
+      summary: Health Check
+      operationId: get_health
+      tags:
+      - Platform
+  /openapi.json:
+    get:
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: {}
+          description: Successful response
+      summary: Get Swagger Json Docs
+      operationId: get_openapi_json
+      tags:
+      - Platform
+  /qt-openapi.json:
+    get:
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema: {}
+          description: Successful response
+      summary: Get Qt Openapi Json
+      operationId: get_qt_openapi_json
+      tags:
+      - Platform
+components:
+  schemas: {}
+  securitySchemes:
+    BearerAuth:
+      scheme: bearer
+      type: http

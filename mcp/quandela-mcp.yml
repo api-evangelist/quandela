@@ -1,0 +1,282 @@
+generated: '2026-08-17'
+method: derived
+status: candidate
+source: openapi/ (6 refined specs derived from https://api.cloud.quandela.com/openapi.json)
+note: 'NO MCP SERVER EXISTS. Quandela publishes no hosted MCP endpoint and no stdio MCP package. Probes:
+  https://api.cloud.quandela.com/mcp -> 404 (JSON envelope), https://mcp.quandela.com/mcp -> DNS failure,
+  npm registry search "quandela" -> 0 results, and no MCP mention in the Perceval docs or on hub.quandela.com/integrate.
+  The tools[] below are a CANDIDATE surface DERIVED from the 49 non-deprecated operations in Quandela''s
+  own published OpenAPI, offered as a design starting point. No endpoint URL is asserted because none
+  exists.'
+deployment:
+  mode: none
+  endpoint: null
+  install: null
+  package: null
+  auth: unknown
+  verified: derived
+server:
+  name: quandela-cloud
+  transport: null
+  url: null
+coverage:
+  openapi_operations_total: 59
+  openapi_operations_deprecated: 10
+  candidate_tools: 49
+  excluded_deprecated_operations:
+  - POST /api/auth/token/delete
+  - POST /api/auth/token/generate
+  - POST /api/auth/token/revoke
+  - GET /api/auth/token/{token_id}
+  - POST /api/auth/tokens/delete
+  - POST /api/job
+  - POST /api/job/cancel/{job_id}
+  - POST /api/job/rerun/{job_id}
+  - GET /api/job/result/{job_id}
+  - GET /api/job/status/{job_id}
+tools:
+- name: get_list_of_job_tokens
+  description: Get list of job tokens
+  category: Api - Job Token
+  source_operation: openapi/quandela-job-token-openapi.yml#get_api_auth_tokens
+  http: GET /api/auth/tokens
+- name: generate_job_token
+  description: Generate job token
+  category: Api - Job Token
+  source_operation: openapi/quandela-job-token-openapi.yml#post_api_auth_tokens
+  http: POST /api/auth/tokens
+- name: delete_token_by_ids
+  description: Delete token by ids
+  category: Api - Job Token
+  source_operation: openapi/quandela-job-token-openapi.yml#post_api_auth_tokens_delete_by_ids
+  http: POST /api/auth/tokens/delete-by-ids
+- name: reopen_token
+  description: Reopen token
+  category: Api - Job Token
+  source_operation: openapi/quandela-job-token-openapi.yml#post_api_auth_tokens_reopen
+  http: POST /api/auth/tokens/reopen
+- name: revoke_token
+  description: Revoke token
+  category: Api - Job Token
+  source_operation: openapi/quandela-job-token-openapi.yml#post_api_auth_tokens_revoke
+  http: POST /api/auth/tokens/revoke
+- name: get_job_token_detail
+  description: Get job token detail
+  category: Api - Job Token
+  source_operation: openapi/quandela-job-token-openapi.yml#get_api_auth_tokens_by_token_id
+  http: GET /api/auth/tokens/{token_id}
+- name: update_job_token
+  description: Update job token
+  category: Api - Job Token
+  source_operation: openapi/quandela-job-token-openapi.yml#put_api_auth_tokens_by_token_id
+  http: PUT /api/auth/tokens/{token_id}
+- name: create_a_job
+  description: Perceval - Create a job
+  category: Api - Perceval Job
+  source_operation: openapi/quandela-perceval-job-openapi.yml#post_api_jobs
+  http: POST /api/jobs
+- name: get_job_availability
+  description: Perceval - Get Job availability
+  category: Api - Perceval Job
+  source_operation: openapi/quandela-perceval-job-openapi.yml#get_api_jobs_availability
+  http: GET /api/jobs/availability
+- name: cancel_a_job
+  description: Perceval - Cancel a job
+  category: Api - Perceval Job
+  source_operation: openapi/quandela-perceval-job-openapi.yml#post_api_jobs_by_job_id_cancel
+  http: POST /api/jobs/{job_id}/cancel
+- name: get_job_data
+  description: Perceval - Get Job Data
+  category: Api - Perceval Job
+  source_operation: openapi/quandela-perceval-job-openapi.yml#get_api_jobs_by_job_id_data
+  http: GET /api/jobs/{job_id}/data
+- name: rerun_a_job
+  description: Perceval - Rerun a job
+  category: Api - Perceval Job
+  source_operation: openapi/quandela-perceval-job-openapi.yml#post_api_jobs_by_job_id_rerun
+  http: POST /api/jobs/{job_id}/rerun
+- name: get_a_job_result
+  description: Perceval - Get a job result
+  category: Api - Perceval Job
+  source_operation: openapi/quandela-perceval-job-openapi.yml#get_api_jobs_by_job_id_result
+  http: GET /api/jobs/{job_id}/result
+- name: get_status_of_a_job
+  description: Perceval - Get status of a job.
+  category: Api - Perceval Job
+  source_operation: openapi/quandela-perceval-job-openapi.yml#get_api_jobs_by_job_id_status
+  http: GET /api/jobs/{job_id}/status
+- name: get_list_of_tokens
+  description: Get list of tokens
+  category: Api - Perceval Job Token
+  source_operation: openapi/quandela-perceval-job-token-openapi.yml#get_api_tokens
+  http: GET /api/tokens
+- name: generate_a_job_token
+  description: Generate a job token
+  category: Api - Perceval Job Token
+  source_operation: openapi/quandela-perceval-job-token-openapi.yml#post_api_tokens
+  http: POST /api/tokens
+- name: delete_tokens_by_keys
+  description: Delete tokens by keys
+  category: Api - Perceval Job Token
+  source_operation: openapi/quandela-perceval-job-token-openapi.yml#post_api_tokens_delete
+  http: POST /api/tokens/delete
+- name: delete_tokens_by_ids
+  description: Delete tokens by ids
+  category: Api - Perceval Job Token
+  source_operation: openapi/quandela-perceval-job-token-openapi.yml#post_api_tokens_delete_by_ids
+  http: POST /api/tokens/delete-by-ids
+- name: reopen_a_job_token
+  description: Reopen a job token
+  category: Api - Perceval Job Token
+  source_operation: openapi/quandela-perceval-job-token-openapi.yml#post_api_tokens_reopen
+  http: POST /api/tokens/reopen
+- name: revoke_a_job_token
+  description: Revoke a job token
+  category: Api - Perceval Job Token
+  source_operation: openapi/quandela-perceval-job-token-openapi.yml#post_api_tokens_revoke
+  http: POST /api/tokens/revoke
+- name: get_usage_statistics_of_job_tokens
+  description: Get usage statistics of job tokens.
+  category: Api - Perceval Job Token
+  source_operation: openapi/quandela-perceval-job-token-openapi.yml#get_api_tokens_usage_report
+  http: GET /api/tokens/usage/report
+- name: get_a_job_token
+  description: Get a job token
+  category: Api - Perceval Job Token
+  source_operation: openapi/quandela-perceval-job-token-openapi.yml#get_api_tokens_by_token_id
+  http: GET /api/tokens/{token_id}
+- name: update_a_job_token
+  description: Update a job token
+  category: Api - Perceval Job Token
+  source_operation: openapi/quandela-perceval-job-token-openapi.yml#put_api_tokens_by_token_id
+  http: PUT /api/tokens/{token_id}
+- name: home
+  description: Home
+  category: Platform
+  source_operation: openapi/quandela-platform-openapi.yml#get_root
+  http: GET /
+- name: health_check
+  description: Health Check
+  category: Platform
+  source_operation: openapi/quandela-platform-openapi.yml#get_health
+  http: GET /health
+- name: get_swagger_json_docs
+  description: Get Swagger Json Docs
+  category: Platform
+  source_operation: openapi/quandela-platform-openapi.yml#get_openapi_json
+  http: GET /openapi.json
+- name: get_qt_openapi_json
+  description: Get Qt Openapi Json
+  category: Platform
+  source_operation: openapi/quandela-platform-openapi.yml#get_qt_openapi_json
+  http: GET /qt-openapi.json
+- name: entropy_raw_random_bytes
+  description: Entropy raw random bytes
+  category: QRNG
+  source_operation: openapi/quandela-qrng-openapi.yml#get_qt_qrng_bytes
+  http: GET /qt/qrng/bytes
+- name: entropy_random_numbers
+  description: Entropy random numbers
+  category: QRNG
+  source_operation: openapi/quandela-qrng-openapi.yml#get_qt_qrng_ints
+  http: GET /qt/qrng/ints
+- name: chemistry_vqe
+  description: Chemistry VQE
+  category: QuantumToolbox
+  source_operation: openapi/quandela-quantum-toolbox-openapi.yml#post_qt_chemistryvqe
+  http: POST /qt/chemistryvqe
+- name: chemistry_vqe_estimator
+  description: Chemistry VQE Estimator
+  category: QuantumToolbox
+  source_operation: openapi/quandela-quantum-toolbox-openapi.yml#post_qt_chemistryvqe_estimate
+  http: POST /qt/chemistryvqe/estimate
+- name: chemistry_vqe_results
+  description: Chemistry VQE Results
+  category: QuantumToolbox
+  source_operation: openapi/quandela-quantum-toolbox-openapi.yml#get_qt_chemistryvqe_by_job_id_results
+  http: GET /qt/chemistryvqe/{job_id}/results
+- name: chemistry_vqe_status
+  description: Chemistry VQE Status
+  category: QuantumToolbox
+  source_operation: openapi/quandela-quantum-toolbox-openapi.yml#get_qt_chemistryvqe_by_job_id_status
+  http: GET /qt/chemistryvqe/{job_id}/status
+- name: custom_vqe
+  description: Custom VQE
+  category: QuantumToolbox
+  source_operation: openapi/quandela-quantum-toolbox-openapi.yml#post_qt_customvqe
+  http: POST /qt/customvqe
+- name: custom_vqe_estimator
+  description: Custom VQE Estimator
+  category: QuantumToolbox
+  source_operation: openapi/quandela-quantum-toolbox-openapi.yml#post_qt_customvqe_estimate
+  http: POST /qt/customvqe/estimate
+- name: custom_vqe_results
+  description: Custom VQE Results
+  category: QuantumToolbox
+  source_operation: openapi/quandela-quantum-toolbox-openapi.yml#get_qt_customvqe_by_job_id_results
+  http: GET /qt/customvqe/{job_id}/results
+- name: custom_vqe_status
+  description: Custom VQE Status
+  category: QuantumToolbox
+  source_operation: openapi/quandela-quantum-toolbox-openapi.yml#get_qt_customvqe_by_job_id_status
+  http: GET /qt/customvqe/{job_id}/status
+- name: cvar_vqe
+  description: CVar VQE
+  category: QuantumToolbox
+  source_operation: openapi/quandela-quantum-toolbox-openapi.yml#post_qt_cvarvqe
+  http: POST /qt/cvarvqe
+- name: cvar_vqe_estimator
+  description: CVar VQE Estimator
+  category: QuantumToolbox
+  source_operation: openapi/quandela-quantum-toolbox-openapi.yml#post_qt_cvarvqe_estimate
+  http: POST /qt/cvarvqe/estimate
+- name: cvar_vqe_results
+  description: CVar VQE Results
+  category: QuantumToolbox
+  source_operation: openapi/quandela-quantum-toolbox-openapi.yml#get_qt_cvarvqe_by_job_id_results
+  http: GET /qt/cvarvqe/{job_id}/results
+- name: cvar_vqe_status
+  description: CVar VQE Status
+  category: QuantumToolbox
+  source_operation: openapi/quandela-quantum-toolbox-openapi.yml#get_qt_cvarvqe_by_job_id_status
+  http: GET /qt/cvarvqe/{job_id}/status
+- name: graph_dsi
+  description: Graph DSI
+  category: QuantumToolbox
+  source_operation: openapi/quandela-quantum-toolbox-openapi.yml#post_qt_graphDSI
+  http: POST /qt/graphDSI
+- name: graph_dsi_estimator
+  description: Graph DSI Estimator
+  category: QuantumToolbox
+  source_operation: openapi/quandela-quantum-toolbox-openapi.yml#post_qt_graphDSI_estimate
+  http: POST /qt/graphDSI/estimate
+- name: graph_dsi_results
+  description: Graph DSI Results
+  category: QuantumToolbox
+  source_operation: openapi/quandela-quantum-toolbox-openapi.yml#get_qt_graphDSI_by_job_id_results
+  http: GET /qt/graphDSI/{job_id}/results
+- name: graph_dsi_status
+  description: Graph DSI Status
+  category: QuantumToolbox
+  source_operation: openapi/quandela-quantum-toolbox-openapi.yml#get_qt_graphDSI_by_job_id_status
+  http: GET /qt/graphDSI/{job_id}/status
+- name: graph_isomorphism
+  description: Graph Isomorphism
+  category: QuantumToolbox
+  source_operation: openapi/quandela-quantum-toolbox-openapi.yml#post_qt_graphIsomorphism
+  http: POST /qt/graphIsomorphism
+- name: graph_isomorphism_estimator
+  description: Graph Isomorphism Estimator
+  category: QuantumToolbox
+  source_operation: openapi/quandela-quantum-toolbox-openapi.yml#post_qt_graphIsomorphism_estimate
+  http: POST /qt/graphIsomorphism/estimate
+- name: graph_isomorphism_results
+  description: Graph Isomorphism Results
+  category: QuantumToolbox
+  source_operation: openapi/quandela-quantum-toolbox-openapi.yml#get_qt_graphIsomorphism_by_job_id_results
+  http: GET /qt/graphIsomorphism/{job_id}/results
+- name: graph_isomorphism_status
+  description: Graph Isomorphism Status
+  category: QuantumToolbox
+  source_operation: openapi/quandela-quantum-toolbox-openapi.yml#get_qt_graphIsomorphism_by_job_id_status
+  http: GET /qt/graphIsomorphism/{job_id}/status

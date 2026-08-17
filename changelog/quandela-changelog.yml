@@ -1,0 +1,119 @@
+generated: '2026-08-17'
+method: searched
+source: https://github.com/Quandela/Perceval/releases
+note: >-
+  Quandela publishes NO changelog for the Quandela Cloud REST API itself. There
+  is no dated release-notes page for api.cloud.quandela.com, no CHANGELOG.md in
+  any Quandela repository (probed: Quandela/Perceval/CHANGELOG.md -> 404), and
+  no changelog entry in the Perceval documentation navigation. The API's only
+  version marker is `info.version: v2.8.0-rc4` inside
+  https://api.cloud.quandela.com/openapi.json, with no history behind it — so
+  the 10 deprecated operations in the current contract have no announcement
+  trail. What IS published, and what is captured below, is a real dated
+  changelog for the FIRST-PARTY CLIENT: GitHub Releases on Quandela/Perceval,
+  the Python SDK through which the cloud surface is actually consumed. Release
+  notes are structured under explicit "New features" / "Improvements" /
+  "Breaking changes" / "Bug fixes" headings, which makes them genuinely usable
+  for change review.
+scope: client-library
+subject: perceval-quandela (Python SDK for Quandela Cloud)
+api_changelog_published: false
+versioning_scheme: semver
+current_version: v1.2.4
+current_version_date: '2026-07-02'
+cadence: 8 releases from 2025-07-10 (v0.13.2) to 2026-07-02 (v1.2.4) — roughly every 4-8 weeks
+release_naming: >-
+  Major/minor releases carry Arthurian codenames ("The Grail Encounter",
+  "The Round Table", "The Royal Court").
+entries:
+  - version: v1.2.4
+    date: '2026-07-02'
+    url: https://github.com/Quandela/Perceval/releases/tag/v1.2.4
+    breaking: false
+    additions:
+      - >-
+        New KipuSession, allowing jobs to be sent to the Kipu Quantum Hub
+        (requires `pip install perceval-quandela[kipu]`) — a second cloud
+        provider target alongside Quandela Cloud.
+    improvements:
+      - GenericInterferometer now accepts a str as interferometer shape.
+  - version: v1.2.3
+    date: '2026-06-17'
+    url: https://github.com/Quandela/Perceval/releases/tag/v1.2.3
+    breaking: true
+    breaking_changes:
+      - >-
+        BSDistribution internal representation changed; it must now be imported
+        from perceval and no longer from exqalibur.
+    additions:
+      - Arithmetic operations on BSDistribution (+ and - between same-mode distributions, * and / with floats).
+    improvements:
+      - HTTP error messages from the cloud API are clearer.
+  - version: v1.2.2
+    date: '2026-06-04'
+    url: https://github.com/Quandela/Perceval/releases/tag/v1.2.2
+    breaking: false
+    improvements:
+      - Sped up creation of BS components.
+    fixes:
+      - Fixed Sampler iterations crashing when used with a RemoteProcessor.
+      - Numeric overflows in backend computations are now properly caught and raised.
+  - version: v1.2.1
+    date: '2026-05-20'
+    name: The Royal Court
+    url: https://github.com/Quandela/Perceval/releases/tag/v1.2.1
+    breaking: false
+    additions:
+      - Main computation classes ported to Exqalibur; SLOS and both simulators now default to Exqalibur.
+      - RemoteProcessor.get_current_noise() returns a NoiseModel reflecting current platform performance.
+      - RemoteProcessor specs are now a dedicated object type guaranteeing field availability.
+      - Fourier interferometers constructible via a Unitary helper method.
+    improvements:
+      - postselect can now be changed within a Sampler's iterations.
+      - Unitary.random() helper added.
+  - version: v1.1.0
+    date: '2025-11-20'
+    name: The Round Table
+    url: https://github.com/Quandela/Perceval/releases/tag/v1.1.0
+    breaking: false
+    additions:
+      - Python 3.14 support.
+      - >-
+        JobGroup gains launch_async_jobs / relaunch_async_failed_jobs and
+        cancel_all; grouped jobs are now grouped in the Quandela Cloud UI by
+        JobGroup name.
+      - PPNR detectors gain a wire_efficiency parameter.
+      - The cloud target URL can now be saved in RemoteConfig.
+    improvements:
+      - HTTP errors from RemoteProcessor / RemoteJob are more explicit.
+      - PersistentData folder configurable via PCVL_PERSISTENT_PATH.
+  - version: v1.0.1
+    date: '2025-09-22'
+    name: The Grail Encounter
+    url: https://github.com/Quandela/Perceval/releases/tag/v1.0.1
+    breaking: false
+    improvements:
+      - Legacy docs clarified NoisyFockState format for distinguishability noise.
+    fixes:
+      - Fixed Expression/Parameter copy and Circuit/Experiment copy with repeated Parameters.
+      - Simulator no longer accepts AnnotatedFockState inputs where invalid.
+      - BasicState can be initialised from a numpy.array again.
+  - version: v1.0.0
+    date: '2025-09-04'
+    name: The Grail Encounter
+    url: https://github.com/Quandela/Perceval/releases/tag/v1.0.0
+    breaking: true
+    note: First 1.0 release of Perceval.
+  - version: v0.13.2
+    date: '2025-07-10'
+    name: Castle of Wonders
+    url: https://github.com/Quandela/Perceval/releases/tag/v0.13.2
+    breaking: false
+related:
+  interop_releases: https://github.com/Quandela/Perceval_Interop/releases
+  cloud_announcement: https://www.quandela.com/about-us/newsroom/may-7th-introducing-quandela-cloud-2-0/
+  community: https://community.quandela.com/
+gaps:
+  - No changelog or release notes for the Quandela Cloud REST API.
+  - No announcement trail for the 10 operations currently marked deprecated in the spec.
+  - No CHANGELOG.md in any Quandela repository (release notes live only in GitHub Releases).

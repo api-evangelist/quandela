@@ -1,0 +1,179 @@
+generated: '2026-08-17'
+method: derived
+source: >-
+  openapi/_original/quandela-cloud-openapi.json (54 component schemas, $ref
+  graph and id-reference fields across 59 operations), plus the anonymous
+  https://api.cloud.quandela.com/api/platforms/public response for the Platform
+  entity
+note: >-
+  The Quandela Cloud data model is small and job-centric: four core entities
+  (Platform, Token, Job, Result) plus two parallel job families — Perceval jobs
+  (arbitrary photonic circuits submitted as an opaque payload) and Quantum
+  Toolbox jobs (five named algorithms with typed parameter and result schemas).
+  Relationships are expressed by scalar id/name reference fields rather than by
+  nested $ref objects, so most edges below are derived from field naming
+  (`platform_id`, `platform_name`, `token_id`, `job_id`, `rerun_from`) and are
+  marked as such.
+identifiers:
+  job_id:
+    type: string
+    format: opaque
+    note: Path parameter on 19 operations. No visible prefix scheme.
+  token_id:
+    type: string
+    note: Path parameter on 5 operations.
+  platform_id:
+    type: uuid
+    example: 5a881293-f071-4570-ac37-40e7f1e61a55
+    source: probed GET /api/platforms/public
+  platform_name:
+    type: namespaced-string
+    pattern: '<type>:<name>'
+    examples: ['qpu:belenos', 'qpu:ascella', 'sim:slos']
+    note: >-
+      The type prefix is semantically load-bearing — `qpu:` is real hardware
+      that consumes credits, `sim:` is a simulator. An agent must read the
+      prefix before submitting.
+  process_id:
+    type: string
+    optional: true
+    note: Caller-supplied. Unique across users; NOT an idempotency key.
+entities:
+  - name: Platform
+    schema: null
+    documented_in_openapi: false
+    source: GET https://api.cloud.quandela.com/api/platforms/public (200, anonymous)
+    description: >-
+      A quantum processing unit or simulator. Not represented by any component
+      schema in the published spec even though platform_id/platform_name are
+      required inputs to job creation — the only machine-readable description
+      of a Platform is the undocumented public endpoint.
+    fields: [id, name, description, type, status, maintenance, statistic, created_date]
+    enums:
+      type: [qpu]
+      status: [unreachable, maintenance]
+    note: >-
+      Enum values listed are those OBSERVED on 2026-08-17, not a published
+      enumeration. Error text elsewhere in the spec implies additional statuses
+      (`decommissioned`, `retired`, `locked`).
+  - name: Token
+    schema: Token
+    aliases: [TokensListUnitResponse, TokenGenerateResponse, TokenGenerateRequest, TokenUpdate]
+    description: >-
+      A Cloud Job Token — the credential the job-execution surface
+      authenticates with, distinct from the account access token used to manage
+      tokens. Carries a label, a priority, an expiry and a revocation state.
+    fields:
+      [id, token, key, label, priority, user_priority, user_id, email,
+       company_id, company_name, created_date, expiration_date, is_revoked,
+       valid, is_apikey, is_explorer_token, count, last_used_time,
+       last_used_duration]
+    states: [active, revoked, expired]
+    transitions:
+      - {from: none, to: active, via: 'POST /api/tokens'}
+      - {from: active, to: revoked, via: 'POST /api/tokens/revoke'}
+      - {from: revoked, to: active, via: 'POST /api/tokens/reopen'}
+      - {from: any, to: deleted, via: 'POST /api/tokens/delete-by-ids'}
+    tiers:
+      - {flag: is_explorer_token, note: 'Explorer-tier tokens are rejected on some operations — 401 "explorer tokens are not allowed".'}
+      - {flag: is_apikey, note: Distinguishes an API key from an interactive token.}
+  - name: Job
+    schema: JobCreate
+    reads: [JobId, JobStatusResponse, JobResult, GetJobDataResonse, RerunJob, RerunJobResponse]
+    description: >-
+      A Perceval computation submitted to a platform. The circuit itself travels
+      as an opaque `payload` object serialised by the Perceval SDK — the spec
+      does not describe its structure, so the REST contract is a thin envelope
+      around an SDK-defined body.
+    fields:
+      [job_name, payload, platform_id, platform_name, max_duration,
+       pcvl_version, process_id, job_group_name]
+    required_on_create: [job_name, payload]
+    read_fields:
+      [job_id, status, status_message, progress, progress_message,
+       creation_datetime, start_time, duration, shots, failure_code,
+       last_intermediate_results, token_id, token_label, command, rerun_from]
+    note: >-
+      `pcvl_version` on the request body couples the job to a Perceval client
+      version — the API is explicitly SDK-versioned at the payload level.
+      `job_group_name` is the grouping key that JobGroup in the SDK (v1.1.0+)
+      uses to cluster jobs in the console.
+  - name: JobResult
+    schema: JobResult
+    fields: [job_id, results, results_type, intermediate_results, duration, shots]
+    description: >-
+      Terminal output of a Perceval job. `results_type` discriminates the
+      payload shape; `intermediate_results` carries the partial trace available
+      before completion.
+  - name: QuantumToolboxJob
+    schema_family: '<Algorithm>Params -> QTJobId -> <Algorithm>JobStatus -> <Algorithm>JobResult'
+    algorithms:
+      - {name: ChemistryVQE, path: /qt/chemistryvqe, params: ChemistryVqeParams, results: ChemistryVqeResults, intermediate: IntermediateChemistryVqeResults}
+      - {name: CustomVQE, path: /qt/customvqe, params: CustomVqeParams, results: CustomVqeResults, intermediate: IntermediateCustomVqeResults}
+      - {name: CVarVQE, path: /qt/cvarvqe, params: CVarVqeParams, results: CVarVqeResults, intermediate: IntermediateCVarVqeResults}
+      - {name: GraphDSI, path: /qt/graphDSI, params: GraphDSIParams, results: GraphDSIResults, intermediate: IntermediateGraphDSIResults}
+      - {name: GraphIsomorphism, path: /qt/graphIsomorphism, params: GraphIsomorphismParams, results: GraphIsomorphismResults, intermediate: IntermediateGraphIsomorphismResults}
+    description: >-
+      Unlike a Perceval Job, each Quantum Toolbox algorithm is fully typed —
+      dedicated params, status, intermediate-result and result schemas. This is
+      the strongest-typed part of the API and the part an agent can call
+      without the SDK.
+    note: >-
+      Every algorithm also exposes a paired `/estimate` operation returning
+      EstimationResult {nb_iterations, nb_shots_per_job, nb_total_shots} — a
+      pre-flight cost estimate before credits are committed.
+  - name: Atom
+    schema: Atom
+    belongs_to: ChemistryVqeParams
+    description: Domain input for the chemistry VQE algorithm — the molecular specification.
+  - name: QrngJob
+    schemas: [JobBytes, JobInts, QrngBytesOutput, QrngIntsOutput]
+    description: >-
+      Entropy quantum random number generation. Synchronous rather than
+      submit-and-poll — GET /qt/qrng/bytes and /qt/qrng/ints return values
+      directly.
+    fields: [id, ints, chsh, min_entropy]
+    note: >-
+      JobInts requires `chsh` and `min_entropy` alongside the values — the QRNG
+      surface returns Bell-inequality (CHSH) and min-entropy certification
+      data with every draw, which is the entropy-quality attestation.
+  - name: TokenUsage
+    schemas: [TokenUsageResponse, TokenUsageUnit]
+    fields: [token_id, total_jobs, usage, credits, free_credits, duration_seconds, nb_jobs, platform_name]
+    description: >-
+      Per-token consumption ledger broken down BY PLATFORM, separating
+      `credits` from `free_credits`. The billing/metering view of the model.
+  - name: JobAvailability
+    schema: JobAvailabilityResponse
+    fields:
+      [max_concurrent_jobs, num_concurrent_jobs, max_jobs_in_queue,
+       num_jobs_in_queue, max_running_qt_jobs, num_running_qt_jobs]
+    description: Per-account capacity snapshot — the concrete ceilings and current usage.
+relationships:
+  - {from: Job, to: Platform, kind: belongs_to, via: platform_id, confidence: high, derivation: id-reference field}
+  - {from: Job, to: Platform, kind: belongs_to, via: platform_name, confidence: high, derivation: name-reference field}
+  - {from: Job, to: Token, kind: belongs_to, via: token_id, confidence: high, derivation: 'GetJobDataResonse.token_id / .token_label'}
+  - {from: Job, to: JobResult, kind: has_one, via: job_id, confidence: high, derivation: 'GET /api/jobs/{job_id}/result'}
+  - {from: Job, to: Job, kind: belongs_to, via: rerun_from, confidence: high, derivation: 'GetJobDataResonse.rerun_from — self-referential rerun lineage'}
+  - {from: Job, to: JobGroup, kind: belongs_to, via: job_group_name, confidence: medium, derivation: 'JobCreate.job_group_name; JobGroup has no REST resource, only the SDK'}
+  - {from: QuantumToolboxJob, to: JobResult, kind: has_one, via: job_id, confidence: high, derivation: 'GET /qt/<alg>/{job_id}/results'}
+  - {from: Token, to: User, kind: belongs_to, via: user_id, confidence: high, derivation: 'Token.user_id / .email'}
+  - {from: Token, to: Company, kind: belongs_to, via: company_id, confidence: high, derivation: 'Token.company_id / .company_name'}
+  - {from: Token, to: TokenUsage, kind: has_one, via: token_id, confidence: high, derivation: 'GET /api/tokens/usage/report'}
+  - {from: TokenUsage, to: Platform, kind: has_many, via: platform_name, confidence: high, derivation: 'TokenUsageUnit is keyed by platform_name'}
+  - {from: ChemistryVqeParams, to: Atom, kind: has_many, via: '$ref', confidence: high, derivation: schema $ref}
+absent_entities:
+  - >-
+    User and Company appear only as foreign keys on Token (user_id, email,
+    company_id, company_name). There is no /users or /companies resource in the
+    REST surface — identity is managed at account.quandela.com, outside this API.
+  - >-
+    JobGroup is referenced by JobCreate.job_group_name and is a first-class
+    concept in the Perceval SDK, but has no REST resource of its own.
+  - >-
+    Platform has no component schema despite being a required job input.
+  - >-
+    There is no Job COLLECTION resource — no GET /api/jobs. Jobs are only
+    addressable one at a time by job_id, so an account's job history is not
+    enumerable over REST.
+render: null

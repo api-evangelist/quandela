@@ -1,0 +1,137 @@
+generated: '2026-08-17'
+method: searched
+source: >-
+  https://api.cloud.quandela.com/openapi.json,
+  https://api.cloud.quandela.com/api/platforms/public,
+  https://api.github.com/repos/Quandela/Perceval/releases,
+  https://www.quandela.com/roadmap/,
+  https://www.quandela.com/legal-terms/
+versioning:
+  scheme: unversioned-path
+  current: v2.8.0-rc4
+  where: openapi info.version at https://api.cloud.quandela.com/openapi.json
+  docs: null
+  policy_published: false
+  note: >-
+    No version segment in any path and no published versioning policy. The
+    production contract self-identifies as a release candidate (v2.8.0-rc4).
+    Breaking change is instead managed by path duplication — see
+    deprecated_operations below.
+deprecation:
+  policy_url: null
+  policy_published: false
+  sunset_header: false
+  deprecation_header: false
+  in_spec_signalling: true
+  note: >-
+    Quandela DOES mark deprecation in the machine-readable contract: 10 of 59
+    operations carry `deprecated: true` and prefix their summary with
+    "DEPRECATED:". That is real, useful signalling. What is missing is the
+    policy around it — there is no deprecation-policy page, no announced sunset
+    date for any of the 10, no RFC 8594 Sunset or Deprecation response header
+    defined on any operation, and no changelog entry explaining the migration.
+    Because no policy document exists, no `Deprecation` pointer is emitted in
+    apis.yml.
+  pattern: >-
+    Singular legacy path deprecated in favour of a plural successor, with the
+    action moved from a path segment to a sub-resource:
+    /api/job -> /api/jobs, /api/job/cancel/{id} -> /api/jobs/{id}/cancel,
+    /api/auth/token -> /api/auth/tokens.
+deprecated_operations:
+  - operation: openapi/quandela-perceval-job-openapi.yml#post_api_job
+    path: POST /api/job
+    successor: POST /api/jobs
+  - operation: openapi/quandela-perceval-job-openapi.yml#post_api_job_cancel_by_job_id
+    path: POST /api/job/cancel/{job_id}
+    successor: POST /api/jobs/{job_id}/cancel
+  - operation: openapi/quandela-perceval-job-openapi.yml#post_api_job_rerun_by_job_id
+    path: POST /api/job/rerun/{job_id}
+    successor: POST /api/jobs/{job_id}/rerun
+  - operation: openapi/quandela-perceval-job-openapi.yml#get_api_job_result_by_job_id
+    path: GET /api/job/result/{job_id}
+    successor: GET /api/jobs/{job_id}/result
+  - operation: openapi/quandela-perceval-job-openapi.yml#get_api_job_status_by_job_id
+    path: GET /api/job/status/{job_id}
+    successor: GET /api/jobs/{job_id}/status
+  - operation: openapi/quandela-job-token-openapi.yml#post_api_auth_token_generate
+    path: POST /api/auth/token/generate
+    successor: POST /api/auth/tokens
+  - operation: openapi/quandela-job-token-openapi.yml#post_api_auth_token_revoke
+    path: POST /api/auth/token/revoke
+    successor: POST /api/auth/tokens/revoke
+  - operation: openapi/quandela-job-token-openapi.yml#get_api_auth_token_by_token_id
+    path: GET /api/auth/token/{token_id}
+    successor: GET /api/auth/tokens/{token_id}
+  - operation: openapi/quandela-perceval-job-token-openapi.yml#post_api_auth_token_delete
+    path: POST /api/auth/token/delete
+    successor: POST /api/auth/tokens/delete-by-ids
+  - operation: openapi/quandela-perceval-job-token-openapi.yml#post_api_auth_tokens_delete
+    path: POST /api/auth/tokens/delete
+    successor: POST /api/auth/tokens/delete-by-ids
+status_page:
+  hosted_page: null
+  machine_readable: https://api.cloud.quandela.com/api/platforms/public
+  method: probed
+  probed: '2026-08-17'
+  http_status: 200
+  auth: none
+  note: >-
+    Quandela publishes no hosted human status page — status.quandela.com does
+    not resolve (DNS failure) and quandela.statuspage.io returns the Atlassian
+    Statuspage marketing site, not a Quandela page. What it DOES publish, and
+    what the StatusPage pointer in apis.yml points at, is a machine-readable
+    per-platform status feed served anonymously from its own API host. Each
+    entry carries a QPU `name`, a `status`, a `maintenance` window with
+    start_time/end_time, and a `statistic` map of daily availability
+    percentages for the trailing ~8 days. That is a genuine, provider-served
+    operational-transparency surface — arguably a stronger one than a hosted
+    incident page, since an agent can consume it directly. It is undocumented:
+    it does not appear in the published openapi.json.
+  observed_2026_08_17:
+    - platform: 'qpu:belenos'
+      description: Belenos QPU
+      type: qpu
+      status: unreachable
+      maintenance_window: '2026-08-27T07:30:00Z .. 2026-08-27T11:00:00Z'
+      availability_range_pct: '20.89 .. 84.42 over 2026-08-10..2026-08-17'
+    - platform: 'qpu:ascella'
+      description: 6 photons QPU
+      type: qpu
+      status: maintenance
+  secondary_health_endpoints:
+    - {url: 'https://api.cloud.quandela.com/health', status: 200, body: '{"message":"ok"}'}
+    - {url: 'https://api.cloud.quandela.com/api/status', status: 200, body: '{"db":"ok","server":"ok"}', documented: false}
+sla:
+  url: null
+  uptime_target: null
+  note: >-
+    No SLA or uptime commitment is published. https://www.quandela.com/legal-terms/
+    (200) is the general legal terms page and carries no API availability
+    commitment. The daily availability percentages on the public platform
+    endpoint (20.89%–84.42% for qpu:belenos in the trailing week) are reported,
+    not promised.
+roadmap:
+  url: https://www.quandela.com/roadmap/
+  status: 200
+  title: Roadmap to Fault Tolerant Quantum Computing
+  scope: hardware
+  note: >-
+    A published multi-year hardware roadmap (the 2024–2030 fault-tolerance
+    plan). It is a device roadmap, not an API roadmap — no API or platform
+    deprecation dates appear on it.
+client_library_lifecycle:
+  source: https://api.github.com/repos/Quandela/Perceval/releases
+  scheme: semver, named releases
+  current: v1.2.4
+  released: '2026-07-02'
+  cadence: >-
+    8 releases traced from v0.13.2 (2025-07-10) through v1.2.4 (2026-07-02) —
+    roughly every 4–8 weeks. Actively maintained.
+  detail: changelog/quandela-changelog.yml
+gaps:
+  - No published deprecation policy or sunset dates for the 10 deprecated operations.
+  - No Sunset / Deprecation response headers (RFC 8594).
+  - No versioning policy; production contract self-identifies as a release candidate.
+  - No SLA or uptime commitment.
+  - No hosted human status/incident page.
+  - The machine-readable platform status feed is undocumented and absent from the OpenAPI.

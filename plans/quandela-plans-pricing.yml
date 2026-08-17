@@ -1,0 +1,86 @@
+generated: '2026-08-17'
+method: searched
+source: >-
+  https://cloud.quandela.com/pricing,
+  https://www.quandela.com/products-and-services/cloud/,
+  https://api.cloud.quandela.com/openapi.json
+plan_count: 0
+currency: null
+note: >-
+  QUANDELA PUBLISHES NO PRICE. A pricing page exists at
+  https://cloud.quandela.com/pricing (HTTP 200) but it is a Vue single-page
+  application: the served HTML is a 3.6 KB shell whose only text is the heading
+  "Quandela Cloud", with all content loaded client-side from
+  /assets/index-a553ec1f.js. Nothing readable — no tier name, no figure, no
+  currency, no quota — is present in the response body, so no plan can be
+  recorded without fabricating it. The marketing page at
+  https://www.quandela.com/products-and-services/cloud/ (200) says only
+  "Flexible pricing option for small experiments up to mission-critical
+  enterprise access" with no numbers. Machine-readable probes for a catalogue
+  endpoint all missed: /api/pricing 404, /api/plans 404, /api/products 404,
+  /api/offers 404, /api/catalog 404, /api/subscriptions/plans 404 on
+  api.cloud.quandela.com. plan_count is therefore an honest 0 — this is a
+  recorded absence of published pricing, not an unchecked field.
+plans: []
+commercial_model:
+  billing_unit: credits
+  evidence: >-
+    The API's own billing model is visible in the contract even though the
+    prices are not. TokenUsageUnit (openapi components.schemas) reports
+    `credits`, `free_credits`, `duration_seconds` and `nb_jobs` broken down by
+    `platform_name`, and GET /api/tokens/usage/report returns it per job token.
+    Credit exhaustion is signalled at job submission as
+    401 "Not enough credits". So: prepaid credits, metered per platform, with a
+    separate free-credit pool.
+  free_tier:
+    exists: true
+    evidence: >-
+      "Try cloud for free" registration on the Quandela Cloud product page, and
+      a distinct `free_credits` field in TokenUsageUnit.
+    quota_published: false
+  enterprise_model:
+    exists: true
+    evidence: >-
+      Error text on POST /api/jobs references platform time budgets specific to
+      Enterprise offers — 401 "Not enough {platform_type} time left" — and
+      403 "Platform {name} is locked, please upgrade your offer to use it",
+      confirming tiered platform entitlements ("offers") gate which QPUs an
+      account may use.
+    tiers_named: false
+  token_tiers:
+    - flag: is_explorer_token
+      note: >-
+        An "explorer" token class exists and is rejected on some operations
+        (401 "explorer tokens are not allowed"). Its commercial position is
+        undocumented.
+  reservation:
+    exists: true
+    name: QPU Reservation Service
+    source: https://www.quandela.com/products-and-services/cloud/
+    priced: false
+alternative_purchase_channels:
+  note: >-
+    Quandela's cloud product page routes buyers to third parties rather than to
+    a self-serve price list. None of these publish Quandela pricing on
+    quandela.com.
+  channels:
+    - {name: Quandela Platform, url: 'https://cloud.quandela.com/', model: direct}
+    - {name: Scaleway Quantum, model: 'purchase compute time via Scaleway'}
+    - {name: GENCI / HQI, model: 'grant-based access for European researchers and industries'}
+    - {name: Exaion Quantum, model: 'sovereign systems in Sherbrooke, Canada'}
+    - {name: OVHcloud, model: reseller/host}
+gaps:
+  - Pricing page is client-side rendered and exposes no machine-readable price.
+  - No price, currency or billing period published for any tier.
+  - Free-tier credit allocation is unquantified.
+  - Enterprise "offers" gate platform access but are unnamed and unpriced.
+  - No machine-readable pricing or product-catalogue endpoint.
+evidence:
+  - {url: 'https://cloud.quandela.com/pricing', status: 200, readable: false, reason: 'JS-rendered SPA shell, 3628 bytes, no pricing text'}
+  - {url: 'https://www.quandela.com/products-and-services/cloud/', status: 200, readable: true, reason: 'prose only, no figures'}
+  - {url: 'https://api.cloud.quandela.com/api/pricing', status: 404}
+  - {url: 'https://api.cloud.quandela.com/api/plans', status: 404}
+  - {url: 'https://api.cloud.quandela.com/api/products', status: 404}
+  - {url: 'https://api.cloud.quandela.com/api/offers', status: 404}
+  - {url: 'https://api.cloud.quandela.com/api/catalog', status: 404}
+  - {url: 'https://api.cloud.quandela.com/api/subscriptions/plans', status: 404}

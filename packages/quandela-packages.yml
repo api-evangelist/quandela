@@ -1,0 +1,85 @@
+generated: '2026-08-17'
+method: searched
+source: >-
+  https://pypi.org/pypi/perceval-quandela/json,
+  https://pypi.org/pypi/perceval-interop/json,
+  https://pypi.org/pypi/exqalibur/json,
+  https://github.com/Quandela
+note: >-
+  Quandela ships a Python-only first-party client stack. Every package is
+  published to PyPI from the Quandela GitHub organisation. Searches of npm
+  (registry.npmjs.org search "quandela" and "perceval" — 0 first-party hits),
+  Maven Central (search.maven.org "quandela" — numFound 0), crates.io
+  ("quandela" — total 0), NuGet, RubyGems, Packagist and pkg.go.dev found no
+  Quandela-authored library. https://hub.quandela.com/integrate advertises a
+  "C SDK" and a "Java SDK" alongside the Python SDK, but neither is published
+  to a public registry and no corresponding repository exists in the 15-repo
+  https://github.com/Quandela organisation, so they are recorded below as
+  advertised-but-undistributed rather than as packages.
+packages:
+  - language: python
+    registry: pypi
+    name: perceval-quandela
+    url: https://pypi.org/project/perceval-quandela/
+    install: pip install perceval-quandela
+    source_code: https://github.com/Quandela/Perceval
+    official: true
+    version: 1.2.4
+    published: '2026-07-02'
+    summary: >-
+      Perceval — the open-source photonic quantum computing framework. This is
+      the primary client for Quandela Cloud: perceval.providers.quandela
+      Session/RemoteProcessor wraps the api.cloud.quandela.com REST surface.
+  - language: python
+    registry: pypi
+    name: perceval-interop
+    url: https://pypi.org/project/perceval-interop/
+    install: pip install perceval-interop
+    source_code: https://github.com/Quandela/Perceval_Interop
+    official: true
+    version: 1.2.5
+    published: '2026-04-30'
+    summary: >-
+      Interoperability bridges between Perceval and Qiskit, QuTiP, cQASM and
+      myQLM.
+  - language: python
+    registry: pypi
+    name: exqalibur
+    url: https://pypi.org/project/exqalibur/
+    install: pip install exqalibur
+    homepage: https://perceval.quandela.net
+    official: true
+    version: 1.4.1
+    published: '2026-07-02'
+    summary: >-
+      Quandela's closed-source native optimisation kernel for Perceval
+      (strong-simulation backends). Released in lockstep with
+      perceval-quandela.
+advertised_not_distributed:
+  - language: c
+    claim: "C SDK"
+    source: https://hub.quandela.com/integrate
+    registry: null
+    version: null
+    published: null
+    note: >-
+      Advertised on the Quandela Hub integrate page. No public registry
+      artifact and no repository in github.com/Quandela; a consumer cannot
+      obtain or version it from a public source.
+  - language: java
+    claim: "Java SDK"
+    source: https://hub.quandela.com/integrate
+    registry: null
+    version: null
+    published: null
+    note: >-
+      Advertised on the Quandela Hub integrate page. Maven Central search for
+      "quandela" returned numFound 0; no repository in github.com/Quandela.
+currency:
+  checked: '2026-08-17'
+  finding: >-
+    The Python stack is current — perceval-quandela 1.2.4 and exqalibur 1.4.1
+    both published 2026-07-02, six weeks before this check, against a Quandela
+    Cloud API reporting version v2.8.0-rc4. No abandonment signal on the
+    distributed packages. The gap is coverage, not decay: the REST surface has
+    59 operations and only the Python SDK reaches it.

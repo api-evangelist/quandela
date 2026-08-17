@@ -1,0 +1,127 @@
+generated: '2026-08-17'
+method: searched
+source: >-
+  https://api.cloud.quandela.com/openapi.json (4xx response descriptions on
+  POST /api/jobs and the /qt/* Quantum Toolbox operations), plus live
+  anonymous header inspection of https://api.cloud.quandela.com/health and
+  /api/status on 2026-08-17
+note: >-
+  Quandela publishes NO conventional request-rate limit — there is no
+  requests-per-second/minute figure anywhere in the spec or the docs, no 429
+  status is declared on any of the 59 operations, and no RateLimit-*,
+  X-RateLimit-* or Retry-After response header is defined in the spec or
+  returned on live responses. What Quandela DOES publish, inside the OpenAPI
+  4xx response descriptions, is a set of real CONCURRENCY and RESOURCE
+  ceilings on quantum job admission. Those are captured below because they are
+  the limits an agent will actually hit. Every ceiling is published as a
+  template placeholder ({MAX_WAITING_JOBS}, {shots_limit}) rather than a
+  number, except max_duration, so the concrete value is only knowable from the
+  error response at runtime.
+limit_count: 6
+response_headers:
+  ratelimit_standard: null
+  x_ratelimit: null
+  retry_after: null
+  observed_on:
+    - url: https://api.cloud.quandela.com/health
+      status: 200
+      headers_present: [Server, Date, Content-Type, Content-Length, Connection]
+      rate_limit_headers: none
+  note: >-
+    No rate-limit signalling of any kind on the wire. An agent has no
+    runtime budget signal and must treat the ceilings below as discoverable
+    only by failing.
+exhaustion_status_codes:
+  - status: 400
+    used_for: waiting-job ceiling, max_duration ceiling, max_shots ceiling
+  - status: 403
+    used_for: concurrent Quantum Toolbox job ceiling
+  - status: 401
+    used_for: credit / platform-time exhaustion (NOT an auth failure — see errors/quandela-problem-types.yml)
+  - status: 429
+    used_for: null
+    present: false
+limits:
+  - name: waiting_jobs
+    scope: per-account (global or offer-specific)
+    window: concurrent
+    limit: '{MAX_WAITING_JOBS}'
+    limit_published_as: placeholder
+    signal: 400 "Cannot create more than {MAX_WAITING_JOBS} jobs"
+    operation: openapi/quandela-perceval-job-openapi.yml#post_api_jobs
+  - name: running_quantum_toolbox_jobs
+    scope: per-account
+    window: concurrent
+    limit: '{MAX_QT_JOBS}'
+    limit_published_as: placeholder
+    signal: 403 "Cannot have more than {MAX_QT_JOBS} running Quantum Toolbox jobs"
+    operation: openapi/quandela-quantum-toolbox-openapi.yml#post_qt_chemistryvqe
+  - name: max_duration_absolute
+    scope: per-job
+    window: per-request
+    limit: 864000
+    unit: seconds
+    limit_published_as: concrete
+    signal: 400 "Max duration too large, exceeding 864000"
+    operation: openapi/quandela-perceval-job-openapi.yml#post_api_jobs
+  - name: max_duration_per_platform
+    scope: per-platform
+    window: per-request
+    limit: '{limit}'
+    unit: seconds
+    limit_published_as: placeholder
+    signal: 400 "Max_duration {value}(s) exceeds the platform limit of {limit}(s)"
+    operation: openapi/quandela-perceval-job-openapi.yml#post_api_jobs
+  - name: max_shots_per_platform
+    scope: per-platform
+    window: per-request
+    limit: '{shots_limit}'
+    limit_published_as: placeholder
+    signal: 400 "Max shots must less than or equal to {shots_limit}"
+    operation: openapi/quandela-perceval-job-openapi.yml#post_api_jobs
+  - name: credit_balance
+    scope: per-account
+    window: prepaid-balance
+    limit: account credit balance (and, on Enterprise offers, platform time)
+    limit_published_as: account-specific
+    signal: >-
+      401 "Not enough credits" / "Not enough credits: all remaining credits are
+      reserved by waiting or running jobs" / "Not enough {platform_type} time left"
+    operation: openapi/quandela-perceval-job-openapi.yml#post_api_jobs
+adjacent_capacity_signals:
+  - name: platform availability
+    url: https://api.cloud.quandela.com/api/platforms/public
+    status: 200
+    auth: none
+    note: >-
+      Anonymous endpoint returning per-QPU `status`, a `maintenance`
+      {start_time, end_time} window, and a `statistic` map of daily
+      availability percentages for the trailing ~8 days. Not a rate limit, but
+      it is the only capacity signal Quandela publishes machine-readably, and
+      the correct pre-flight check before submitting a job.
+  - name: job availability
+    operation: openapi/quandela-perceval-job-openapi.yml#get_api_jobs_availability
+    auth: job token
+    schema: JobAvailabilityResponse
+    fields:
+      [max_concurrent_jobs, num_concurrent_jobs, max_jobs_in_queue,
+       num_jobs_in_queue, max_running_qt_jobs, num_running_qt_jobs]
+    note: >-
+      The one place the ceilings become concrete. This authenticated endpoint
+      returns the account's actual max_concurrent_jobs, max_jobs_in_queue and
+      max_running_qt_jobs alongside current usage — i.e. the numbers the
+      {MAX_WAITING_JOBS} and {MAX_QT_JOBS} placeholders stand in for. Because
+      the values are per-offer and behind a job token, they are not publishable
+      here; an agent should call this before submitting rather than relying on
+      the spec text. Effectively a body-carried substitute for RateLimit-*
+      headers, but it must be polled explicitly rather than arriving with every
+      response.
+  - name: token usage report
+    operation: openapi/quandela-perceval-job-token-openapi.yml#get_api_tokens_usage_report
+    auth: bearer
+    note: Per-token usage statistics with start_time/end_time query window — the consumption ledger.
+gaps:
+  - No published requests-per-interval limit.
+  - No 429 Too Many Requests anywhere in the spec.
+  - No RateLimit-* / X-RateLimit-* / Retry-After headers on any response.
+  - Concrete ceiling values are placeholders in the spec; discoverable only from a failed request.

@@ -1,0 +1,127 @@
+generated: '2026-08-17'
+method: searched
+source: >-
+  https://www.quandela.com/products-and-services/cloud/,
+  https://perceval.quandela.net/docs/v1.2/reference/providers.html,
+  https://api.cloud.quandela.com/openapi.json,
+  https://api.cloud.quandela.com/api/platforms/public
+note: >-
+  Quandela has NO test-vs-live key separation and NO fixture/magic-value
+  sandbox in the payments sense — there are no test key prefixes, no test
+  tokens, no time simulation and no trigger tooling. What it has instead, and
+  what is captured below, is the quantum-computing equivalent: a
+  SIMULATOR-VS-QPU split addressed through the `platform_name` namespace, plus
+  a cost-estimation pre-flight on every Quantum Toolbox algorithm. Both are
+  real, published, and are the correct way for an agent to rehearse a workload
+  before spending credits on hardware. Every value below is quoted from
+  Quandela's own documentation or observed on a live anonymous response; none
+  is invented.
+test_vs_live:
+  mechanism: platform namespace prefix
+  discriminator_field: platform_name
+  note: >-
+    The same credential, the same base URL and the same operations serve both.
+    The ONLY thing separating a rehearsal from a hardware run is the prefix on
+    `platform_name`, which is a soft guard: there is no separate sandbox host,
+    no test-mode token flag, and nothing in the API contract that prevents an
+    agent from sending `qpu:` when it meant `sim:`. This is the single largest
+    sandbox-safety gap on the API.
+  prefixes:
+    - prefix: 'sim:'
+      meaning: >-
+        Simulator / emulator. Classical simulation of the photonic circuit,
+        including GPU-enhanced emulation. Documented example from the Perceval
+        provider reference: "sim:slos".
+      source: https://perceval.quandela.net/docs/v1.2/reference/providers.html
+    - prefix: 'qpu:'
+      meaning: >-
+        Real quantum hardware. Consumes credits and is subject to maintenance
+        windows and availability. Observed live: "qpu:belenos" (Belenos QPU),
+        "qpu:ascella" (6 photons QPU).
+      source: https://api.cloud.quandela.com/api/platforms/public
+  credentials:
+    test_key_prefix: null
+    live_key_prefix: null
+    note: >-
+      No key-prefix scheme at all. Cloud Job Tokens carry an
+      `is_explorer_token` boolean and a `priority`, but explorer is a
+      commercial tier, not a test mode — explorer tokens are REJECTED on some
+      operations (401 "Authentication failed: explorer tokens are not
+      allowed"), so an agent cannot treat one as a safe rehearsal credential.
+free_access:
+  available: true
+  entry_point: https://cloud.quandela.com/
+  signal: >-
+    "Try cloud for free" registration is offered on
+    https://www.quandela.com/products-and-services/cloud/. The token usage
+    ledger (TokenUsageUnit) distinguishes `free_credits` from `credits`, which
+    confirms a free-credit allocation exists in the billing model.
+  quota_published: false
+  note: >-
+    No free-tier quota figure is published anywhere. The amount of free credit,
+    which platforms it reaches, and whether it includes QPU time are all
+    undocumented — an agent cannot determine its rehearsal budget without
+    authenticating and calling GET /api/tokens/usage/report.
+  grant_programs:
+    - name: GENCI / HQI quantum credits grant
+      audience: European researchers and industries
+      source: https://www.quandela.com/products-and-services/cloud/
+dry_run:
+  available: true
+  mechanism: paired /estimate operations on every Quantum Toolbox algorithm
+  note: >-
+    The genuinely strong part of Quandela's rehearsal story, and unusual enough
+    to call out: each of the five Quantum Toolbox algorithms publishes a
+    dedicated estimator that returns cost WITHOUT running the workload.
+  returns:
+    schema: EstimationResult
+    fields: [nb_iterations, nb_shots_per_job, nb_total_shots]
+  operations:
+    - openapi/quandela-quantum-toolbox-openapi.yml#post_qt_chemistryvqe_estimate
+    - openapi/quandela-quantum-toolbox-openapi.yml#post_qt_customvqe_estimate
+    - openapi/quandela-quantum-toolbox-openapi.yml#post_qt_cvarvqe_estimate
+    - openapi/quandela-quantum-toolbox-openapi.yml#post_qt_graphDSI_estimate
+    - openapi/quandela-quantum-toolbox-openapi.yml#post_qt_graphIsomorphism_estimate
+  not_available_for: >-
+    Perceval jobs (POST /api/jobs) have no estimator. Arbitrary circuits can
+    only be bounded in advance by setting max_shots and max_duration.
+pre_flight_checks:
+  - name: platform availability
+    url: https://api.cloud.quandela.com/api/platforms/public
+    auth: none
+    status: 200
+    note: >-
+      Anonymous. Returns per-QPU status, the next maintenance window, and daily
+      availability percentages. Observed 2026-08-17: qpu:belenos "unreachable",
+      qpu:ascella "maintenance" — i.e. NEITHER published QPU was runnable that
+      day. An agent that submits without checking this will burn a submission on
+      an unavailable device.
+  - name: job slot availability
+    operation: openapi/quandela-perceval-job-openapi.yml#get_api_jobs_availability
+    auth: job token
+    note: Returns the account's concurrency ceilings and current usage.
+  - name: service health
+    url: https://api.cloud.quandela.com/health
+    auth: none
+    status: 200
+    body: '{"message":"ok"}'
+budget_guards:
+  - field: max_shots
+    on: POST /api/jobs
+    note: 'Per-platform ceiling; exceeding it returns 400 "Max shots must less than or equal to {shots_limit}".'
+  - field: max_duration
+    on: POST /api/jobs
+    unit: seconds
+    absolute_max: 864000
+    note: 'Also subject to a per-platform ceiling. Zero is rejected: 400 "Max duration must not be zero".'
+  - field: is_explorer_token
+    on: token creation
+    note: Commercial tier flag, not a test mode.
+absent:
+  - No sandbox or staging host (there is one base URL, https://api.cloud.quandela.com/).
+  - No test-mode credential or key prefix.
+  - No magic/fixture values of any kind.
+  - No time simulation or test clocks.
+  - No published free-tier quota.
+  - No estimator for arbitrary Perceval jobs.
+  - No guard in the contract against submitting to `qpu:` when `sim:` was intended.

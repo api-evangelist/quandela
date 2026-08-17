@@ -1,0 +1,813 @@
+openapi: 3.0.3
+info:
+  title: Quandela Cloud API — Api - Job Token
+  version: v2.8.0-rc4
+  description: "\nThis is the official API documentation.\n\n## Overview\n\nThis API provides access to various features and services.  \n\n## Authentication\n\nAll endpoints require an access token generated\
+    \ by the authorization server.\n\nInclude the token in the request headers:\n\n```http\nAuthorization: Bearer YOUR_ACCESS_TOKEN\n```\nEnsure the token is valid and not expired.\n\n"
+  contact:
+    name: Support
+    url: https://www.quandela.com/about-us/contact-us/
+  termsOfService: https://www.quandela.com/legal-terms/
+servers:
+- url: https://api.cloud.quandela.com/
+tags:
+- name: Api - Job Token
+  description: APIs related to job token
+paths:
+  /api/auth/token/generate:
+    post:
+      deprecated: true
+      description: 'API used to generate job token for current or another user.
+
+
+        Authenticate by `Logged-in Token` of user or `Cloud Job Token`'
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenGenerateRequest'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenGenerateResponse'
+          description: Success
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: 'Unknown user, Can''t assign priority higher than user priority,         Label already exists: {label}'
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Unauthorized
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Permission denied
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+          description: Validation error
+      security:
+      - BearerAuth: []
+      summary: 'DEPRECATED: Generate job token'
+      tags:
+      - Api - Job Token
+      operationId: post_api_auth_token_generate
+  /api/auth/token/revoke:
+    post:
+      deprecated: true
+      description: 'API used to revoke token.
+
+        Require `token:edit` permission.
+
+
+        Authenticate by `Logged-in Token` of user.'
+      parameters: []
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RevokeToken'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DefaultResponse'
+          description: Success
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Can't not revoke
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Authentication error
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Permission denied
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+          description: Validation error
+      security:
+      - BearerAuth: []
+      summary: 'DEPRECATED: Revoke token'
+      tags:
+      - Api - Job Token
+      operationId: post_api_auth_token_revoke
+  /api/auth/token/{token_id}:
+    get:
+      deprecated: true
+      description: 'API used to get token detail.
+
+        Require `token:view` permission
+
+
+        Authenticate by `Logged-in Token` of user.'
+      parameters:
+      - in: path
+        name: token_id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Token'
+          description: Success
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: 'Invalid token: {token_id}'
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Authentication error
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Permission denied
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Not found
+      security:
+      - BearerAuth: []
+      summary: 'DEPRECATED: Get job token detail'
+      tags:
+      - Api - Job Token
+      operationId: get_api_auth_token_by_token_id
+  /api/auth/tokens:
+    get:
+      description: 'API used to get list of job tokens for current user or specified user.
+
+
+        If user_id is not provided, defaults to the current user''s tokens.
+
+
+        Require `token:view` permission.
+
+
+        Authenticate by `Logged-in Token` of user or `Cloud Job Token`'
+      parameters:
+      - description: Default value = 1000 if null
+        in: query
+        name: limit
+        required: false
+        schema:
+          example: 1000
+          maximum: 10000
+          minimum: 1
+          nullable: true
+          type: integer
+      - description: Default value = 0 if null
+        in: query
+        name: offset
+        required: false
+        schema:
+          example: 0
+          nullable: true
+          type: integer
+      - description: 'Optional: User ID to filter tokens. If not provided, defaults to current user'
+        in: query
+        name: user_id
+        required: false
+        schema:
+          example: null
+          nullable: true
+          type: integer
+      - description: 'Optional: Whether to include expired tokens in the results. Default is true to include expired tokens, set to false to exclude them'
+        in: query
+        name: include_expired
+        required: false
+        schema:
+          nullable: true
+          type: boolean
+      - description: 'Optional: Whether to include revoked tokens in the results. Default is true to include revoked tokens, set to false to exclude them'
+        in: query
+        name: include_revoked
+        required: false
+        schema:
+          nullable: true
+          type: boolean
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/TokensListUnitResponse'
+                type: array
+          description: Success
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Authentication error
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Permission denied
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+          description: Validation error
+      security:
+      - BearerAuth: []
+      summary: Get list of job tokens
+      tags:
+      - Api - Job Token
+      operationId: get_api_auth_tokens
+    post:
+      description: 'API used to generate job token for current or another user.
+
+
+        Authenticate by `Logged-in Token` of user or `Cloud Job Token`'
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenGenerateRequest'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenGenerateResponse'
+          description: Success
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: 'Unknown user, Can''t assign priority higher than user priority,         Label already exists: {label}'
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Unauthorized
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Permission denied
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+          description: Validation error
+      security:
+      - BearerAuth: []
+      summary: Generate job token
+      tags:
+      - Api - Job Token
+      operationId: post_api_auth_tokens
+  /api/auth/tokens/delete-by-ids:
+    post:
+      description: 'API used to delete token.
+
+
+        Require `token:delete` permission.
+
+
+        Authenticate by `Logged-in Token` of user or `Cloud Job Token`'
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ListTokenIds'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DefaultResponse'
+          description: Success
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Tokens not found or Can't delete the current active token
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Unauthorized
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Permission denied
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+          description: Validation error
+      security:
+      - BearerAuth: []
+      summary: Delete token by ids
+      tags:
+      - Api - Job Token
+      operationId: post_api_auth_tokens_delete_by_ids
+  /api/auth/tokens/reopen:
+    post:
+      description: 'The API was used to reopen a previously revoked token.
+
+        Require `token:edit` permission.
+
+
+        Authenticate by `Logged-in Token` of user.'
+      parameters: []
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RevokeToken'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DefaultResponse'
+          description: Success
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Invalid token
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Authentication error
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Permission denied
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+          description: Validation error
+      security:
+      - BearerAuth: []
+      summary: Reopen token
+      tags:
+      - Api - Job Token
+      operationId: post_api_auth_tokens_reopen
+  /api/auth/tokens/revoke:
+    post:
+      description: 'API used to revoke token.
+
+        Require `token:edit` permission.
+
+
+        Authenticate by `Logged-in Token` of user.'
+      parameters: []
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RevokeToken'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DefaultResponse'
+          description: Success
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Can't not revoke
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Authentication error
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Permission denied
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+          description: Validation error
+      security:
+      - BearerAuth: []
+      summary: Revoke token
+      tags:
+      - Api - Job Token
+      operationId: post_api_auth_tokens_revoke
+  /api/auth/tokens/{token_id}:
+    get:
+      description: 'API used to get token detail.
+
+        Require `token:view` permission
+
+
+        Authenticate by `Logged-in Token` of user.'
+      parameters:
+      - in: path
+        name: token_id
+        required: true
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Token'
+          description: Success
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: 'Invalid token: {token_id}'
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Authentication error
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Permission denied
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Not found
+      security:
+      - BearerAuth: []
+      summary: Get job token detail
+      tags:
+      - Api - Job Token
+      operationId: get_api_auth_tokens_by_token_id
+    put:
+      description: 'Update label and priority of token from token id.
+
+
+        Require `token:edit` permission
+
+
+        Authenticate by `Logged-in Token` of user.'
+      parameters:
+      - in: path
+        name: token_id
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenUpdate'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DefaultResponse'
+          description: Success
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Invalid data
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Authentication error
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Permission denied
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Not found
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+          description: Validation error
+      security:
+      - BearerAuth: []
+      summary: Update job token
+      tags:
+      - Api - Job Token
+      operationId: put_api_auth_tokens_by_token_id
+components:
+  schemas:
+    DefaultResponse:
+      additionalProperties: true
+      properties:
+        message:
+          example: ok
+          nullable: true
+          type: string
+      type: object
+    HTTPError:
+      properties:
+        detail:
+          type: object
+        error:
+          type: string
+      type: object
+    ListTokenIds:
+      additionalProperties: true
+      properties:
+        token_ids:
+          items:
+            type: integer
+          type: array
+      required:
+      - token_ids
+      type: object
+    RevokeToken:
+      additionalProperties: true
+      properties:
+        token:
+          example: _T_eyJhbGciOiJIUzUxMiIsImlhdCI6MTY3MTg0ODU0NSwiZXhwIjoxNjc0NDQwNT
+          type: string
+      required:
+      - token
+      type: object
+    Token:
+      additionalProperties: true
+      properties:
+        company_id:
+          description: ID of the company that the user who owns the API key belongs to
+          example: 1
+          nullable: true
+          type: integer
+        company_name:
+          description: Company name
+          example: Quandela
+          nullable: true
+          type: string
+        count:
+          description: Number of times the API key was used
+          example: 1
+          nullable: true
+          type: integer
+        created_date:
+          description: Date when the API key was created
+          format: date-time
+          nullable: true
+          type: string
+        email:
+          description: Email of the user who owns the API key
+          example: admin@quande.la
+          format: email
+          nullable: true
+          type: string
+        expiration_date:
+          description: Date when the API key will expire
+          format: date-time
+          nullable: true
+          type: string
+        id:
+          description: ID of the API key
+          example: 1
+          nullable: true
+          type: integer
+        is_apikey:
+          description: Whether the API key is an API key or not
+          example: true
+          nullable: true
+          type: boolean
+        is_explorer_token:
+          nullable: true
+          type: boolean
+        label:
+          description: Label of the API key
+          example: None
+          nullable: true
+          type: string
+        last_used_duration:
+          description: Last use duration of the token
+          example: 1
+          nullable: true
+          type: integer
+        last_used_time:
+          description: Date when the API key was last used
+          format: date-time
+          nullable: true
+          type: string
+        priority:
+          description: Priority of the API key
+          example: 1
+          nullable: true
+          type: integer
+        token:
+          description: API key
+          example: _T_eyJhbGciOiJIUzUxMiIsImlhdCI6MTY3MTg0ODU0NSwiZXhwIjoxNjc0NDQwNTQ1fQ.eyJpZCI6NDl9.M4UuwDLw2BrATJPpzoAvFw7Z84BttKaWGPHgSmMO9xGi3E84q4JRzwze5PcNrAZXaNWo1tCshWTQxYBN1Sxorw
+          nullable: true
+          type: string
+        user_id:
+          description: ID of the user who owns the API key
+          example: 1
+          nullable: true
+          type: integer
+        user_priority:
+          description: Priority of the user who owns the API key
+          example: 1
+          nullable: true
+          type: integer
+        valid:
+          description: Whether the API key is valid or not
+          example: true
+          nullable: true
+          type: boolean
+      type: object
+    TokenGenerateRequest:
+      additionalProperties: true
+      properties:
+        duration:
+          default: 86400
+          description: Duration of access token in seconds
+          example: 86400
+          nullable: true
+          type: integer
+        is_explorer_token:
+          nullable: true
+          type: boolean
+        label:
+          default: unknown
+          description: Label of the token
+          example: unknown
+          nullable: true
+          type: string
+        priority:
+          default: 0
+          description: Number presenting the priority, must be lower than the user's priority, default is 0
+          example: 1
+          nullable: true
+          type: integer
+        user_id:
+          description: ID of the User, default is id of current user
+          example: 1
+          nullable: true
+          type: integer
+      type: object
+    TokenGenerateResponse:
+      additionalProperties: true
+      properties:
+        duration:
+          description: Duration of access token in seconds
+          example: 3600
+          nullable: true
+          type: integer
+        token:
+          description: Access token for authentication
+          example: _T_eyJhbGciOiJIUzUxMiIsImlhdCI6MTY3MTg0ODU0NSwiZXhwIjoxNjc0NDQwNTQ1fQ.eyJpZCI6NDl9.M4UuwDLw2BrATJPpzoAvFw7Z84BttKaWGPHgSmMO9xGi3E84q4JRzwze5PcNrAZXaNWo1tCshWTQxYBN1Sxorw
+          nullable: true
+          type: string
+        token_id:
+          nullable: true
+          type: integer
+      type: object
+    TokenUpdate:
+      additionalProperties: true
+      properties:
+        label:
+          default: unknown
+          description: Label of the token
+          example: unknown
+          nullable: true
+          type: string
+        priority:
+          description: Number presenting the priority, must be lower than the user's priority, default is 0
+          example: 1
+          nullable: true
+          type: integer
+      type: object
+    TokensListUnitResponse:
+      additionalProperties: true
+      properties:
+        count:
+          nullable: true
+          type: integer
+        created_date:
+          format: date-time
+          nullable: true
+          type: string
+        expiration_date:
+          format: date-time
+          nullable: true
+          type: string
+        id:
+          nullable: true
+          type: integer
+        is_revoked:
+          nullable: true
+          type: boolean
+        key:
+          nullable: true
+          type: string
+        label:
+          nullable: true
+          type: string
+        last_used_time:
+          format: date-time
+          nullable: true
+          type: string
+        priority:
+          nullable: true
+          type: integer
+        user_id:
+          nullable: true
+          type: integer
+      type: object
+    ValidationError:
+      properties:
+        detail:
+          properties:
+            <location>:
+              properties:
+                <field_name>:
+                  items:
+                    type: string
+                  type: array
+              type: object
+          type: object
+        message:
+          type: string
+      type: object
+  securitySchemes:
+    BearerAuth:
+      scheme: bearer
+      type: http

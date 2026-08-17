@@ -1,0 +1,177 @@
+generated: '2026-08-17'
+method: derived
+source: >-
+  openapi/_original/quandela-cloud-openapi.json,
+  openapi/_original/quandela-quantum-toolbox-openapi.json,
+  well-known/quandela-well-known.yml, security/quandela-domain-security.yml,
+  security/quandela-vulnerability-disclosure.yml (absent),
+  https://www.quandela.com/legal-terms/, https://www.quandela.com/privacy-policy/
+note: >-
+  Cross-cutting standards assertions for the Quandela Cloud API, derived from
+  the published contract and the probe artifacts in this repo. Quandela
+  publishes no certification or compliance program page (no trust centre, no
+  SOC 2 / ISO 27001 / GDPR compliance statement beyond the privacy policy), so
+  NO `Compliance` pointer is emitted in apis.yml — see the compliance block
+  below.
+standards:
+  - id: openapi-3.0
+    conforms: true
+    evidence: >-
+      https://api.cloud.quandela.com/openapi.json declares openapi 3.0.3 with
+      55 paths / 59 operations / 54 component schemas, served anonymously.
+  - id: openapi-3.1
+    conforms: false
+    evidence: Published contract is 3.0.3, not 3.1.x.
+  - id: http-bearer-auth
+    conforms: true
+    evidence: 'components.securitySchemes.BearerAuth = {type: http, scheme: bearer}, applied to 55 of 59 operations.'
+  - id: oauth2
+    conforms: false
+    evidence: >-
+      No oauth2 securityScheme. Tokens are opaque bearer credentials minted by
+      account.quandela.com and by POST /api/tokens; no authorization or token
+      endpoint is published, and /.well-known/oauth-authorization-server 404s
+      on every host.
+  - id: oidc
+    conforms: false
+    evidence: >-
+      No openIdConnect securityScheme. /.well-known/openid-configuration 404s on
+      api.cloud.quandela.com and returns an HTML SPA shell (soft-200) on
+      account.quandela.com — see well-known/quandela-well-known.yml.
+  - id: rfc9457-problem-details
+    conforms: false
+    evidence: >-
+      Errors are application/json shaped {detail, error} (schema HTTPError) with
+      no type/title/instance members and no application/problem+json
+      representation anywhere in the spec.
+  - id: rfc7807-problem-json
+    conforms: false
+    evidence: Same as rfc9457 — vendor error envelope only.
+  - id: rfc9116-security-txt
+    conforms: false
+    evidence: >-
+      /.well-known/security.txt returns 404 on api.cloud.quandela.com,
+      www.quandela.com and hub.quandela.com; soft-200 HTML on the three SPA
+      hosts. No Policy or Contact published.
+  - id: rfc8594-sunset-header
+    conforms: false
+    evidence: >-
+      10 of 59 operations carry `deprecated: true`, but no Sunset or Deprecation
+      response header is defined on any operation and no sunset date is published.
+  - id: rfc6585-429
+    conforms: false
+    evidence: >-
+      No 429 status appears on any of the 59 operations; concurrency and credit
+      ceilings surface as 400/403/401. No Retry-After header defined.
+  - id: ietf-ratelimit-headers
+    conforms: false
+    evidence: >-
+      No RateLimit-* or X-RateLimit-* headers in the spec or on live responses
+      (verified against GET /health, 200).
+  - id: idempotency-key
+    conforms: false
+    evidence: >-
+      Zero occurrences of "idempoten" in the published spec. `process_id` on
+      POST /api/jobs is a uniqueness guard that 400s on collision, not
+      idempotent replay.
+  - id: pagination
+    conforms: partial
+    evidence: >-
+      limit/offset query parameters on the two token-list operations
+      (GET /api/tokens, GET /api/auth/tokens). No pagination elsewhere; no job
+      list resource exists at all.
+  - id: json-api
+    conforms: false
+    evidence: Plain JSON resources; no JSON:API document structure or media type.
+  - id: asyncapi
+    conforms: false
+    evidence: >-
+      No AsyncAPI document (probed /asyncapi.yaml and /asyncapi.json on the API
+      host, 404) and no event surface — the API is submit-then-poll only.
+  - id: webhooks
+    conforms: false
+    evidence: >-
+      No callback, webhook or subscription operation in the spec; /webhooks and
+      /events 404 on the API host.
+  - id: mcp
+    conforms: false
+    evidence: >-
+      No MCP server. /mcp 404s on api.cloud.quandela.com; mcp.quandela.com does
+      not resolve; npm search "quandela" returns 0 packages.
+  - id: a2a
+    conforms: false
+    evidence: >-
+      /.well-known/agent-card.json and /.well-known/agent.json return 404 on
+      every real host and HTML SPA shells on the three catch-all hosts. No agent
+      card exists.
+  - id: llmstxt
+    conforms: false
+    evidence: /llms.txt returns 404 on www.quandela.com, hub.quandela.com and perceval.quandela.net.
+  - id: graphql
+    conforms: false
+    evidence: /graphql returns 404 on api.cloud.quandela.com.
+  - id: grpc-protobuf
+    conforms: false
+    evidence: >-
+      No .proto published in the 15-repo github.com/Quandela organisation and
+      none referenced in the docs. Quandela/QDMI-Perceval implements the C++
+      Quantum Device Management Interface (QDMI), which is a native C ABI, not
+      protobuf.
+  - id: qdmi
+    conforms: true
+    domain: quantum
+    evidence: >-
+      https://github.com/Quandela/QDMI-Perceval — a Quandela implementation of
+      the Quantum Device Management Interface, the Munich Quantum Software Stack
+      device-abstraction standard. A real domain-standard conformance signal,
+      distinct from the REST API.
+  - id: openqasm
+    conforms: partial
+    domain: quantum
+    evidence: >-
+      Quandela does not consume OpenQASM directly; perceval-interop
+      (PyPI 1.2.5) bridges Perceval to cQASM, Qiskit, QuTiP and myQLM, giving
+      indirect interchange with the OpenQASM ecosystem via Qiskit.
+  - id: tls-1.3
+    conforms: true
+    evidence: 'security/quandela-domain-security.yml — TLSv1.3 on www.quandela.com and api.cloud.quandela.com.'
+  - id: hsts
+    conforms: false
+    evidence: 'security/quandela-domain-security.yml — no Strict-Transport-Security on either host.'
+  - id: dnssec
+    conforms: false
+    evidence: 'security/quandela-domain-security.yml — DNSSEC not enabled on quandela.com.'
+  - id: caa
+    conforms: false
+    evidence: 'security/quandela-domain-security.yml — no CAA records on quandela.com.'
+  - id: spf
+    conforms: true
+    evidence: 'security/quandela-domain-security.yml — SPF present on quandela.com.'
+  - id: dmarc
+    conforms: true
+    policy: quarantine
+    evidence: 'security/quandela-domain-security.yml — DMARC present, policy quarantine (not reject).'
+compliance:
+  program_published: false
+  trust_center: false
+  certifications: []
+  note: >-
+    No trust centre, no certification page and no named certification anywhere
+    on the Quandela public surface — probe-security-programs.py returned
+    vdp=none trust=none, and trust.quandela.com / security.quandela.com /
+    quandela.com/trust do not exist. https://www.quandela.com/legal-terms/ (200)
+    and https://www.quandela.com/privacy-policy/ (200) are the only published
+    governance documents; as an EU (France) operator Quandela is GDPR-bound by
+    territory, but a legal obligation is not a published compliance program and
+    is not asserted here as conformance. Because nothing is published, no
+    `Compliance` pointer is emitted in apis.yml.
+summary:
+  standards_asserted: 27
+  conforms_true: 6
+  conforms_partial: 2
+  conforms_false: 19
+  strongest: OpenAPI 3.0.3 published anonymously with full 4xx documentation; QDMI implementation.
+  weakest: >-
+    No error standard, no rate-limit standard, no idempotency, no discovery
+    surface (.well-known, llms.txt, MCP, A2A all absent), no published
+    compliance program.

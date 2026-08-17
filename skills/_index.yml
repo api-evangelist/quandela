@@ -1,0 +1,90 @@
+generated: '2026-08-17'
+method: generated
+source: >-
+  Derived from openapi/ (six per-tag specs refined from
+  https://api.cloud.quandela.com/openapi.json) plus
+  conventions/quandela-conventions.yml, errors/quandela-problem-types.yml,
+  authentication/quandela-authentication.yml,
+  rate-limits/quandela-rate-limits.yml and sandbox/quandela-sandbox.yml.
+note: >-
+  Four packaged Agent Skills, one per marquee flow on the Quandela Cloud API.
+  Every operationId referenced in these skills exists verbatim in the specs
+  under openapi/ (the ids are derived — Quandela ships none — and the derivation
+  is recorded in overlays/quandela-cloud-overlay.yaml). No provider-published
+  skill or AGENTS.md exists: github.com/Quandela has no AGENTS.md or skills
+  directory in any of its 15 repositories, and the Perceval documentation
+  publishes no agent guidance. These are generated operating instructions, not
+  vendor material.
+skills:
+  - file: quandela-submit-perceval-job.md
+    name: Submit a Perceval job to a Quandela QPU and collect the result
+    api: openapi/quandela-perceval-job-openapi.yml
+    flow: job-execution
+    operations:
+      - post_api_tokens
+      - get_api_jobs_availability
+      - post_api_jobs
+      - get_api_jobs_by_job_id_status
+      - get_api_jobs_by_job_id_result
+      - get_api_jobs_by_job_id_data
+      - post_api_jobs_by_job_id_cancel
+      - post_api_jobs_by_job_id_rerun
+      - post_api_tokens_revoke
+  - file: quandela-run-quantum-toolbox-algorithm.md
+    name: Estimate then run a Quandela Quantum Toolbox algorithm
+    api: openapi/quandela-quantum-toolbox-openapi.yml
+    flow: quantum-primitives
+    operations:
+      - post_qt_chemistryvqe_estimate
+      - post_qt_chemistryvqe
+      - get_qt_chemistryvqe_by_job_id_status
+      - get_qt_chemistryvqe_by_job_id_results
+      - post_qt_customvqe_estimate
+      - post_qt_customvqe
+      - post_qt_cvarvqe_estimate
+      - post_qt_cvarvqe
+      - post_qt_graphDSI_estimate
+      - post_qt_graphDSI
+      - post_qt_graphIsomorphism_estimate
+      - post_qt_graphIsomorphism
+      - get_api_jobs_availability
+  - file: quandela-manage-cloud-job-tokens.md
+    name: Mint, rotate, audit and revoke Quandela Cloud Job Tokens
+    api: openapi/quandela-perceval-job-token-openapi.yml
+    flow: credential-lifecycle
+    operations:
+      - post_api_tokens
+      - get_api_tokens
+      - get_api_tokens_by_token_id
+      - put_api_tokens_by_token_id
+      - post_api_tokens_revoke
+      - post_api_tokens_reopen
+      - post_api_tokens_delete_by_ids
+      - get_api_tokens_usage_report
+  - file: quandela-draw-certified-quantum-randomness.md
+    name: Draw certified quantum randomness from Quandela Entropy (QRNG)
+    api: openapi/quandela-qrng-openapi.yml
+    flow: qrng
+    operations:
+      - get_qt_qrng_bytes
+      - get_qt_qrng_ints
+cross_cutting_rules_every_skill_carries:
+  - >-
+    No idempotency exists on this API. `process_id` on POST /api/jobs is a
+    uniqueness guard that 400s on collision, not an idempotent replay, and the
+    Quantum Toolbox has no equivalent at all — so a blind retry after a timeout
+    can consume credits twice.
+  - >-
+    HTTP 401 is overloaded. Quandela returns 401 for credit and platform-time
+    exhaustion as well as for authentication failure, so an agent that handles
+    401 by refreshing its credential will loop forever on "Not enough credits".
+    Every skill branches on the `error` string.
+  - >-
+    No rate-limit headers and no 429. Concurrency ceilings surface as 400/403 and
+    the concrete numbers are only available from GET /api/jobs/availability.
+  - >-
+    Errors are a vendor {detail, error} envelope with no machine-readable code —
+    string matching on `error` is unavoidable.
+  - >-
+    Check GET /api/platforms/public (anonymous, undocumented) before submitting:
+    on 2026-08-17 both published QPUs reported unreachable / maintenance.

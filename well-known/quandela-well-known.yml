@@ -1,0 +1,140 @@
+generated: '2026-08-17'
+method: probed
+source: live HTTP probes, 2026-08-17
+note: >-
+  RECORDED ABSENCE. Quandela serves no /.well-known/ discovery document on any
+  host. Five hosts were probed for five paths each. www.quandela.com and
+  hub.quandela.com return honest 404s. Three hosts — cloud.quandela.com,
+  account.quandela.com and training.quandela.com — are single-page-app
+  catch-alls that answer HTTP 200 with an HTML shell for EVERY /.well-known/*
+  path (identical <!DOCTYPE html> body, same <title>, no JSON); those are
+  scored as MISSES, not hits. api.cloud.quandela.com — the real API host —
+  returns its own JSON 404 envelope for every path. No WellKnown or SecurityTxt
+  pointer is emitted in apis.yml, because nothing on this surface exists.
+hosts:
+  - host: https://api.cloud.quandela.com
+    role: api
+    documents:
+      - path: /.well-known/security.txt
+        status: 404
+      - path: /.well-known/openid-configuration
+        status: 404
+      - path: /.well-known/oauth-authorization-server
+        status: 404
+      - path: /.well-known/oauth-protected-resource
+        status: 404
+      - path: /.well-known/api-catalog
+        status: 404
+      - path: /.well-known/ai-plugin.json
+        status: 404
+      - path: /.well-known/agent-card.json
+        status: 404
+      - path: /.well-known/agent.json
+        status: 404
+  - host: https://www.quandela.com
+    role: website
+    documents:
+      - path: /.well-known/security.txt
+        status: 404
+      - path: /.well-known/openid-configuration
+        status: 404
+      - path: /.well-known/oauth-authorization-server
+        status: 404
+      - path: /.well-known/api-catalog
+        status: 404
+      - path: /.well-known/ai-plugin.json
+        status: 404
+      - path: /.well-known/agent-card.json
+        status: 404
+      - path: /.well-known/agent.json
+        status: 404
+  - host: https://hub.quandela.com
+    role: developer-hub
+    documents:
+      - path: /.well-known/security.txt
+        status: 404
+      - path: /.well-known/openid-configuration
+        status: 404
+      - path: /.well-known/oauth-authorization-server
+        status: 404
+      - path: /.well-known/api-catalog
+        status: 404
+      - path: /.well-known/ai-plugin.json
+        status: 404
+      - path: /.well-known/agent-card.json
+        status: 404
+      - path: /.well-known/agent.json
+        status: 404
+  - host: https://account.quandela.com
+    role: identity
+    spa_catch_all: true
+    documents:
+      - path: /.well-known/openid-configuration
+        status: 200
+        result: miss
+        reason: >-
+          HTML SPA shell (<title>Quandela Account Management</title>), not an
+          OIDC discovery document. The same body is returned for
+          /realms/quandela/.well-known/openid-configuration and
+          /auth/realms/quandela/.well-known/openid-configuration.
+      - path: /.well-known/oauth-authorization-server
+        status: 200
+        result: miss
+        reason: identical HTML SPA shell
+      - path: /.well-known/security.txt
+        status: 200
+        result: miss
+        reason: identical HTML SPA shell
+      - path: /.well-known/api-catalog
+        status: 200
+        result: miss
+        reason: identical HTML SPA shell
+      - path: /.well-known/agent-card.json
+        status: 200
+        result: miss
+        reason: identical HTML SPA shell
+      - path: /.well-known/agent.json
+        status: 200
+        result: miss
+        reason: identical HTML SPA shell
+  - host: https://cloud.quandela.com
+    role: console
+    spa_catch_all: true
+    documents:
+      - path: /.well-known/security.txt
+        status: 200
+        result: miss
+        reason: HTML SPA shell served for every path, including /openapi.json
+      - path: /.well-known/openid-configuration
+        status: 200
+        result: miss
+        reason: HTML SPA shell
+      - path: /.well-known/oauth-authorization-server
+        status: 200
+        result: miss
+        reason: HTML SPA shell
+      - path: /.well-known/api-catalog
+        status: 200
+        result: miss
+        reason: HTML SPA shell
+      - path: /.well-known/ai-plugin.json
+        status: 200
+        result: miss
+        reason: HTML SPA shell
+      - path: /.well-known/agent-card.json
+        status: 200
+        result: miss
+        reason: HTML SPA shell
+      - path: /.well-known/agent.json
+        status: 200
+        result: miss
+        reason: HTML SPA shell
+summary:
+  hosts_probed: 5
+  documents_found: 0
+  spa_soft_200_hosts: 3
+  security_txt: false
+  openid_configuration: false
+  oauth_authorization_server: false
+  api_catalog: false
+  agent_card: false

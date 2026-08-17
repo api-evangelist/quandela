@@ -1,0 +1,40 @@
+generated: '2026-08-17'
+method: derived
+source: >-
+  Derived from the arazzo/*.yml files in this directory. Every step operationId
+  is verified present in the referenced openapi/ document; the operationIds
+  themselves are derived (Quandela's published spec ships none) and the
+  derivation is recorded in overlays/quandela-cloud-overlay.yaml.
+workflows:
+  - file: quandela-submit-and-collect-perceval-job.yml
+    workflowId: submit-and-collect-perceval-job
+    title: Submit a Perceval job to Quandela Cloud and collect the result
+    summary: >-
+      Mint a per-run Cloud Job Token, verify concurrency headroom, submit a
+      photonic-circuit job with a process_id duplicate guard, poll to completion,
+      collect the result and submission record, then revoke the token.
+    sources: [openapi/quandela-perceval-job-token-openapi.yml, openapi/quandela-perceval-job-openapi.yml]
+    steps: 7
+  - file: quandela-estimate-and-run-chemistry-vqe.yml
+    workflowId: estimate-and-run-chemistry-vqe
+    title: Estimate then run a Chemistry VQE workload on Quandela Quantum Toolbox
+    summary: >-
+      Price the workload with the paired /estimate operation before committing
+      credits, gate on nb_total_shots, check the Quantum Toolbox concurrency
+      ceiling, submit, poll, collect, then audit consumption. The same shape
+      applies to customvqe, cvarvqe, graphDSI and graphIsomorphism.
+    sources:
+      - openapi/quandela-perceval-job-token-openapi.yml
+      - openapi/quandela-perceval-job-openapi.yml
+      - openapi/quandela-quantum-toolbox-openapi.yml
+    steps: 8
+  - file: quandela-rotate-and-audit-job-token.yml
+    workflowId: rotate-and-audit-job-token
+    title: Rotate and audit a Quandela Cloud Job Token
+    summary: >-
+      Inspect the outgoing credential, capture its per-platform consumption
+      ledger before it becomes unaddressable, mint the replacement, verify it,
+      then revoke and delete the old one. Fully automatable — Quandela exposes
+      the whole credential lifecycle over the API.
+    sources: [openapi/quandela-perceval-job-token-openapi.yml]
+    steps: 6

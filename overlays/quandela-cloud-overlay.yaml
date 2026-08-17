@@ -1,0 +1,118 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements for the Quandela Cloud API
+  version: 1.0.0
+extends: openapi/_original/quandela-cloud-openapi.json
+x-generated: '2026-08-17'
+x-method: generated
+x-source: >-
+  Enhancements applied by the API Evangelist enrichment pipeline on 2026-08-17
+  when refining https://api.cloud.quandela.com/openapi.json (fetched verbatim to
+  openapi/_original/quandela-cloud-openapi.json) into the six per-tag documents
+  under openapi/. This overlay records exactly what we added so the harvested
+  original stays pristine and every change is auditable and reversible.
+x-notes:
+  - >-
+    THE PROVIDER SHIPS NO operationId. All 59 operations in Quandela's published
+    spec omit operationId entirely, which means no code generator, Arazzo
+    workflow, MCP tool binding or agent skill can reference an operation
+    stably. We derived deterministic ids of the form
+    <method>_<path with {param} rewritten to by_param, non-alphanumerics to _>,
+    e.g. GET /api/jobs/{job_id}/status -> get_api_jobs_by_job_id_status. The
+    derivation is mechanical and reproducible; it is OUR addition, not
+    Quandela's, and it is the single highest-value fix available to this API.
+  - >-
+    FOUR OPERATIONS ARE UNTAGGED in the original — GET /, GET /health,
+    GET /openapi.json, GET /qt-openapi.json. We grouped them under a new
+    "Platform" tag so the tag split is total and no operation is orphaned.
+  - >-
+    NO RESPONSE EXAMPLES EXIST anywhere in the original (0 of 258 declared
+    responses carries an example or examples member). We did not invent any.
+    The live response bodies we did observe anonymously are recorded in
+    errors/quandela-problem-types.yml and conventions/quandela-conventions.yml
+    as probe evidence rather than injected into the contract.
+actions:
+  - target: $.info
+    description: Record the provenance of this profile on the contract itself.
+    update:
+      x-apievangelist-profile: https://apis.io/provider/quandela
+      x-apievangelist-source: https://api.cloud.quandela.com/openapi.json
+      x-apievangelist-harvested: '2026-08-17'
+      x-apievangelist-note: >-
+        Independent third-party profile. Quandela publishes this contract
+        anonymously at the API host root; the API-reference UI at
+        /api/docs/ requires a login, so the specification is the only
+        publicly readable description of the surface.
+  - target: $.tags
+    description: >-
+      Add the Platform tag that the four untagged service-root operations were
+      assigned to during the per-tag refinement.
+    update:
+      - name: Platform
+        description: Service root, health check and specification endpoints
+  - target: $.paths./api/jobs.post
+    description: >-
+      Add the derived operationId and flag the absence of an idempotency
+      contract on the one credit-consuming write on the API.
+    update:
+      operationId: post_api_jobs
+      x-apievangelist-idempotency: none
+      x-apievangelist-note: >-
+        No Idempotency-Key. process_id is a cross-user uniqueness guard that
+        returns 400 on collision rather than replaying the prior response, so a
+        retry after a network timeout can consume credits twice. See
+        conventions/quandela-conventions.yml.
+  - target: $.paths./api/jobs/{job_id}/status.get
+    description: Add the derived operationId to the primary poll operation.
+    update:
+      operationId: get_api_jobs_by_job_id_status
+  - target: $.paths./api/jobs/{job_id}/result.get
+    description: Add the derived operationId to the result-fetch operation.
+    update:
+      operationId: get_api_jobs_by_job_id_result
+  - target: $.paths./api/jobs/{job_id}/cancel.post
+    description: Add the derived operationId to the cancel operation.
+    update:
+      operationId: post_api_jobs_by_job_id_cancel
+  - target: $.paths./api/jobs/availability.get
+    description: >-
+      Add the derived operationId and mark this as the runtime capacity signal
+      standing in for the absent RateLimit-* headers.
+    update:
+      operationId: get_api_jobs_availability
+      x-apievangelist-role: rate-limit-substitute
+      x-apievangelist-note: >-
+        Returns max_concurrent_jobs / max_jobs_in_queue / max_running_qt_jobs
+        with current usage. The only concrete form of the {MAX_WAITING_JOBS} and
+        {MAX_QT_JOBS} ceilings the 400/403 error text refers to. See
+        rate-limits/quandela-rate-limits.yml.
+  - target: $.paths./api/tokens.post
+    description: Add the derived operationId to job-token creation.
+    update:
+      operationId: post_api_tokens
+  - target: $.paths./api/tokens/usage/report.get
+    description: Add the derived operationId to the consumption ledger.
+    update:
+      operationId: get_api_tokens_usage_report
+  - target: $.paths./qt/qrng/bytes.get
+    description: Add the derived operationId to the Entropy QRNG byte draw.
+    update:
+      operationId: get_qt_qrng_bytes
+  - target: $.paths./qt/qrng/ints.get
+    description: Add the derived operationId to the Entropy QRNG integer draw.
+    update:
+      operationId: get_qt_qrng_ints
+  - target: $.components.securitySchemes.BearerAuth
+    description: >-
+      Record that a single declared scheme covers two operationally distinct
+      credential classes, which the spec does not distinguish.
+    update:
+      x-apievangelist-note: >-
+        One BearerAuth scheme, two credentials. Token-administration operations
+        expect an account access token from account.quandela.com (401 "token not
+        found"); the job-execution and Quantum Toolbox operations expect a Cloud
+        Job Token minted by POST /api/tokens (401 "Invalid or expired job
+        token"). The tag descriptions say "Authenticate by `Cloud Job Token`"
+        but the security scheme is undifferentiated, so an agent cannot tell
+        from the contract which credential a given operation wants. See
+        authentication/quandela-authentication.yml.
