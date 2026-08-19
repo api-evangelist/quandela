@@ -71,7 +71,7 @@ tags:
 url: https://raw.githubusercontent.com/api-evangelist/quandela/refs/heads/main/apis.yml
 created: '2026-05-25'
 modified: '2026-08-17'
-specificationVersion: '0.20'
+specificationVersion: '0.23'
 apis:
   - name: Quandela Cloud API
     description: >-
