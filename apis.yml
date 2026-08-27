@@ -91,82 +91,162 @@ created: '2026-05-25'
 modified: '2026-08-17'
 specificationVersion: '0.23'
 apis:
-  - name: Quandela Cloud API
-    description: >-
-      The core Quandela Cloud REST surface — Perceval job submission,
-      status/result polling, cancel and rerun, plus the full Cloud Job Token
-      lifecycle (create, list, read, update, revoke, reopen, delete) and a
-      per-platform consumption ledger separating credits from free credits.
-      Submit-then-poll only: there is no webhook, callback or event surface. Ten
-      of the operations in this contract are marked deprecated (singular legacy
-      paths superseded by plural successors) with no published sunset dates.
-    humanURL: https://cloud.quandela.com/
-    baseURL: https://api.cloud.quandela.com/
-    tags:
-      - Quantum Cloud
-      - Job Orchestration
-      - QPU
-      - Perceval
-    properties:
-      - type: OpenAPI
-        url: openapi/quandela-perceval-job-openapi.yml
-      - type: OpenAPI
-        url: openapi/quandela-perceval-job-token-openapi.yml
-      - type: OpenAPI
-        url: openapi/quandela-job-token-openapi.yml
-      - type: OpenAPI
-        url: openapi/quandela-platform-openapi.yml
-      - type: Documentation
-        url: https://perceval.quandela.net/docs/v1.2/reference/providers.html
-      - type: Overlay
-        url: overlays/quandela-cloud-overlay.yaml
-      - type: Authentication
-        url: authentication/quandela-authentication.yml
-      - type: Conventions
-        url: conventions/quandela-conventions.yml
-      - type: ErrorCatalog
-        url: errors/quandela-problem-types.yml
-      - type: DataModel
-        url: data-model/quandela-data-model.yml
-      - type: RateLimits
-        url: rate-limits/quandela-rate-limits.yml
-      - type: Sandbox
-        url: sandbox/quandela-sandbox.yml
-  - name: Quandela Quantum Toolbox API
-    description: >-
-      Quandela's pre-built quantum primitives, published as a separate
-      specification at https://api.cloud.quandela.com/qt-openapi.json. Five
-      fully typed algorithms — Chemistry VQE, Custom VQE, CVaR VQE, Graph DSI
-      and Graph Isomorphism — each with dedicated params, status, intermediate
-      result and result schemas, and each paired with an /estimate operation
-      that returns nb_iterations / nb_shots_per_job / nb_total_shots without
-      running the workload or spending credits. Also carries the Entropy QRNG,
-      the only synchronous operations on the platform, whose draws return CHSH
-      and min-entropy certification alongside the values. Unlike Perceval job
-      submission, this surface is callable directly over HTTP with no SDK.
-    humanURL: https://hub.quandela.com/integrate
-    baseURL: https://api.cloud.quandela.com/
-    tags:
-      - Quantum Simulation
-      - Variational Quantum Algorithms
-      - Quantum Chemistry
-      - Graph Algorithms
-      - Quantum Random Number Generation
-    properties:
-      - type: OpenAPI
-        url: openapi/quandela-quantum-toolbox-openapi.yml
-      - type: OpenAPI
-        url: openapi/quandela-qrng-openapi.yml
-      - type: Documentation
-        url: https://hub.quandela.com/integrate
-      - type: Authentication
-        url: authentication/quandela-authentication.yml
-      - type: Conventions
-        url: conventions/quandela-conventions.yml
-      - type: ErrorCatalog
-        url: errors/quandela-problem-types.yml
-      - type: RateLimits
-        url: rate-limits/quandela-rate-limits.yml
+- aid: quandela:quandela-api-job-token-api
+  name: Quandela Api - Job Token API
+  description: APIs related to job token
+  humanURL: https://cloud.quandela.com/
+  baseURL: https://api.cloud.quandela.com/
+  tags:
+  - Api - Job Token
+  properties:
+  - type: OpenAPI
+    url: openapi/quandela-api-job-token-api-openapi.yml
+  - type: Documentation
+    url: https://perceval.quandela.net/docs/v1.2/reference/providers.html
+  - type: Authentication
+    url: authentication/quandela-authentication.yml
+  - type: Conventions
+    url: conventions/quandela-conventions.yml
+  - type: ErrorCatalog
+    url: errors/quandela-problem-types.yml
+  - type: DataModel
+    url: data-model/quandela-data-model.yml
+  - type: RateLimits
+    url: rate-limits/quandela-rate-limits.yml
+  - type: Sandbox
+    url: sandbox/quandela-sandbox.yml
+  - type: Documentation
+    url: https://hub.quandela.com/integrate
+- aid: quandela:quandela-api-perceval-job-api
+  name: Quandela Api - Perceval Job API
+  description: Operations about job - Authenticate by `Cloud Job Token`
+  humanURL: https://cloud.quandela.com/
+  baseURL: https://api.cloud.quandela.com/
+  tags:
+  - Api - Perceval Job
+  properties:
+  - type: OpenAPI
+    url: openapi/quandela-api-perceval-job-api-openapi.yml
+  - type: Documentation
+    url: https://perceval.quandela.net/docs/v1.2/reference/providers.html
+  - type: Authentication
+    url: authentication/quandela-authentication.yml
+  - type: Conventions
+    url: conventions/quandela-conventions.yml
+  - type: ErrorCatalog
+    url: errors/quandela-problem-types.yml
+  - type: DataModel
+    url: data-model/quandela-data-model.yml
+  - type: RateLimits
+    url: rate-limits/quandela-rate-limits.yml
+  - type: Sandbox
+    url: sandbox/quandela-sandbox.yml
+  - type: Documentation
+    url: https://hub.quandela.com/integrate
+- aid: quandela:quandela-api-perceval-job-token-api
+  name: Quandela Api - Perceval Job Token API
+  description: Operations about job token - Authenticate by `Cloud Job Token`
+  humanURL: https://cloud.quandela.com/
+  baseURL: https://api.cloud.quandela.com/
+  tags:
+  - Api - Perceval Job Token
+  properties:
+  - type: OpenAPI
+    url: openapi/quandela-api-perceval-job-token-api-openapi.yml
+  - type: Documentation
+    url: https://perceval.quandela.net/docs/v1.2/reference/providers.html
+  - type: Authentication
+    url: authentication/quandela-authentication.yml
+  - type: Conventions
+    url: conventions/quandela-conventions.yml
+  - type: ErrorCatalog
+    url: errors/quandela-problem-types.yml
+  - type: DataModel
+    url: data-model/quandela-data-model.yml
+  - type: RateLimits
+    url: rate-limits/quandela-rate-limits.yml
+  - type: Sandbox
+    url: sandbox/quandela-sandbox.yml
+  - type: Documentation
+    url: https://hub.quandela.com/integrate
+- aid: quandela:quandela-platform-api
+  name: Quandela Platform API
+  description: Service root, health check and specification endpoints
+  humanURL: https://cloud.quandela.com/
+  baseURL: https://api.cloud.quandela.com/
+  tags:
+  - Platform
+  properties:
+  - type: OpenAPI
+    url: openapi/quandela-platform-api-openapi.yml
+  - type: Documentation
+    url: https://perceval.quandela.net/docs/v1.2/reference/providers.html
+  - type: Authentication
+    url: authentication/quandela-authentication.yml
+  - type: Conventions
+    url: conventions/quandela-conventions.yml
+  - type: ErrorCatalog
+    url: errors/quandela-problem-types.yml
+  - type: DataModel
+    url: data-model/quandela-data-model.yml
+  - type: RateLimits
+    url: rate-limits/quandela-rate-limits.yml
+  - type: Sandbox
+    url: sandbox/quandela-sandbox.yml
+  - type: Documentation
+    url: https://hub.quandela.com/integrate
+- aid: quandela:quandela-qrng-api
+  name: Quandela QRNG API
+  description: Quantum Random Number generation
+  humanURL: https://cloud.quandela.com/
+  baseURL: https://api.cloud.quandela.com/
+  tags:
+  - QRNG
+  properties:
+  - type: OpenAPI
+    url: openapi/quandela-qrng-api-openapi.yml
+  - type: Documentation
+    url: https://perceval.quandela.net/docs/v1.2/reference/providers.html
+  - type: Authentication
+    url: authentication/quandela-authentication.yml
+  - type: Conventions
+    url: conventions/quandela-conventions.yml
+  - type: ErrorCatalog
+    url: errors/quandela-problem-types.yml
+  - type: DataModel
+    url: data-model/quandela-data-model.yml
+  - type: RateLimits
+    url: rate-limits/quandela-rate-limits.yml
+  - type: Sandbox
+    url: sandbox/quandela-sandbox.yml
+  - type: Documentation
+    url: https://hub.quandela.com/integrate
+- aid: quandela:quandela-quantumtoolbox-api
+  name: Quandela Quantum Toolbox API
+  description: Quantum Toolbox entrypoints
+  humanURL: https://cloud.quandela.com/
+  baseURL: https://api.cloud.quandela.com/
+  tags:
+  - QuantumToolbox
+  properties:
+  - type: OpenAPI
+    url: openapi/quandela-quantumtoolbox-api-openapi.yml
+  - type: Documentation
+    url: https://perceval.quandela.net/docs/v1.2/reference/providers.html
+  - type: Authentication
+    url: authentication/quandela-authentication.yml
+  - type: Conventions
+    url: conventions/quandela-conventions.yml
+  - type: ErrorCatalog
+    url: errors/quandela-problem-types.yml
+  - type: DataModel
+    url: data-model/quandela-data-model.yml
+  - type: RateLimits
+    url: rate-limits/quandela-rate-limits.yml
+  - type: Sandbox
+    url: sandbox/quandela-sandbox.yml
+  - type: Documentation
+    url: https://hub.quandela.com/integrate
 common:
   - type: AgenticAccess
     url: agentic-access/quandela-agentic-access.yml
