@@ -21,146 +21,146 @@ x-note: >-
   equivalent. The same four-step shape applies to customvqe, cvarvqe, graphDSI
   and graphIsomorphism — swap the operationIds.
 sourceDescriptions:
-  - name: tokens
-    url: ../openapi/quandela-perceval-job-token-openapi.yml
-    type: openapi
-  - name: jobs
-    url: ../openapi/quandela-perceval-job-openapi.yml
-    type: openapi
-  - name: toolbox
-    url: ../openapi/quandela-quantum-toolbox-openapi.yml
-    type: openapi
+- name: apiPercevalJobApi
+  url: ../openapi/quandela-api-perceval-job-api-openapi.yml
+  type: openapi
+- name: apiPercevalJobTokenApi
+  url: ../openapi/quandela-api-perceval-job-token-api-openapi.yml
+  type: openapi
+- name: quantumtoolboxApi
+  url: ../openapi/quandela-quantumtoolbox-api-openapi.yml
+  type: openapi
 workflows:
-  - workflowId: estimate-and-run-chemistry-vqe
-    summary: Cost-gated Chemistry VQE execution on Quandela Cloud.
-    inputs:
-      type: object
-      required: [account_token, chemistry_params]
-      properties:
-        account_token:
-          type: string
-          description: Account access token from account.quandela.com (Bearer).
-        token_label:
-          type: string
-          default: arazzo-qt-run
-        chemistry_params:
-          type: object
-          description: >-
-            ChemistryVqeParams body, including the Atom[] molecular
-            specification. Identical body is sent to the estimator and the run.
-        shot_budget:
-          type: integer
-          description: >-
-            Caller's ceiling. Compare against the estimator's nb_total_shots
-            before submitting; abort if it exceeds this.
-    steps:
-      - stepId: mint-job-token
-        description: Mint a short-lived Cloud Job Token for this run.
-        operationId: $sourceDescriptions.tokens.post_api_tokens
-        requestBody:
-          contentType: application/json
-          payload:
-            label: $inputs.token_label
-            duration: 3600
-            priority: 0
-            is_explorer_token: false
-        successCriteria:
-          - condition: $statusCode == 200
-        outputs:
-          job_token: $response.body#/token
-
-      - stepId: estimate-cost
+- workflowId: estimate-and-run-chemistry-vqe
+  summary: Cost-gated Chemistry VQE execution on Quandela Cloud.
+  inputs:
+    type: object
+    required: [account_token, chemistry_params]
+    properties:
+      account_token:
+        type: string
+        description: Account access token from account.quandela.com (Bearer).
+      token_label:
+        type: string
+        default: arazzo-qt-run
+      chemistry_params:
+        type: object
         description: >-
-          Price the workload WITHOUT running it. Gate on nb_total_shots against
-          the caller's shot_budget before spending anything.
-        operationId: $sourceDescriptions.toolbox.post_qt_chemistryvqe_estimate
-        requestBody:
-          contentType: application/json
-          payload: $inputs.chemistry_params
-        successCriteria:
-          - condition: $statusCode == 200
-        outputs:
-          nb_total_shots: $response.body#/nb_total_shots
-          nb_iterations: $response.body#/nb_iterations
-          nb_shots_per_job: $response.body#/nb_shots_per_job
-
-      - stepId: check-qt-capacity
+          ChemistryVqeParams body, including the Atom[] molecular
+          specification. Identical body is sent to the estimator and the run.
+      shot_budget:
+        type: integer
         description: >-
-          Read max_running_qt_jobs / num_running_qt_jobs. The Quantum Toolbox
-          ceiling is enforced as 403 "Cannot have more than {MAX_QT_JOBS} running
-          Quantum Toolbox jobs" — note it is a 403, unlike the Perceval
-          waiting-job ceiling which is a 400.
-        operationId: $sourceDescriptions.jobs.get_api_jobs_availability
-        successCriteria:
-          - condition: $statusCode == 200
-        outputs:
-          max_running_qt_jobs: $response.body#/max_running_qt_jobs
-          num_running_qt_jobs: $response.body#/num_running_qt_jobs
-
-      - stepId: submit-chemistry-vqe
-        description: >-
-          Submit the workload. There is no idempotency key and no process_id
-          guard on the Toolbox surface, so persist the returned job_id
-          immediately — there is no job list endpoint to recover it from.
-        operationId: $sourceDescriptions.toolbox.post_qt_chemistryvqe
-        requestBody:
-          contentType: application/json
-          payload: $inputs.chemistry_params
-        successCriteria:
-          - condition: $statusCode == 200
-        outputs:
-          job_id: $response.body#/job_id
-
-      - stepId: poll-status
-        description: >-
-          Poll with exponential backoff. VQE status responses can carry
-          IntermediateChemistryVqeResults, so convergence is observable before
-          the job terminates.
-        operationId: $sourceDescriptions.toolbox.get_qt_chemistryvqe_by_job_id_status
-        parameters:
-          - name: job_id
-            in: path
-            value: $steps.submit-chemistry-vqe.outputs.job_id
-        successCriteria:
-          - condition: $statusCode == 200
-        outputs:
-          status: $response.body#/status
-
-      - stepId: get-results
-        description: Collect ChemistryVqeResults.
-        operationId: $sourceDescriptions.toolbox.get_qt_chemistryvqe_by_job_id_results
-        parameters:
-          - name: job_id
-            in: path
-            value: $steps.submit-chemistry-vqe.outputs.job_id
-        successCriteria:
-          - condition: $statusCode == 200
-        outputs:
-          results: $response.body#/results
-
-      - stepId: audit-consumption
-        description: >-
-          Read the per-platform consumption ledger for this token — credits and
-          free_credits are reported separately. The only way to answer "what did
-          this run consume"; note that no price list is published, so cost in
-          currency is not knowable.
-        operationId: $sourceDescriptions.tokens.get_api_tokens_usage_report
-        successCriteria:
-          - condition: $statusCode == 200
-        outputs:
-          total_jobs: $response.body#/total_jobs
-          usage: $response.body#/usage
-
-      - stepId: revoke-job-token
-        description: Revoke the run's token.
-        operationId: $sourceDescriptions.tokens.post_api_tokens_revoke
-        requestBody:
-          contentType: application/json
-          payload:
-            token: $steps.mint-job-token.outputs.job_token
-        successCriteria:
-          - condition: $statusCode == 200
+          Caller's ceiling. Compare against the estimator's nb_total_shots
+          before submitting; abort if it exceeds this.
+  steps:
+  - stepId: mint-job-token
+    description: Mint a short-lived Cloud Job Token for this run.
+    operationId: $sourceDescriptions.apiPercevalJobTokenApi.post_api_tokens
+    requestBody:
+      contentType: application/json
+      payload:
+        label: $inputs.token_label
+        duration: 3600
+        priority: 0
+        is_explorer_token: false
+    successCriteria:
+    - condition: $statusCode == 200
     outputs:
-      estimated_total_shots: $steps.estimate-cost.outputs.nb_total_shots
-      job_id: $steps.submit-chemistry-vqe.outputs.job_id
-      results: $steps.get-results.outputs.results
+      job_token: $response.body#/token
+
+  - stepId: estimate-cost
+    description: >-
+      Price the workload WITHOUT running it. Gate on nb_total_shots against
+      the caller's shot_budget before spending anything.
+    operationId: $sourceDescriptions.quantumtoolboxApi.post_qt_chemistryvqe_estimate
+    requestBody:
+      contentType: application/json
+      payload: $inputs.chemistry_params
+    successCriteria:
+    - condition: $statusCode == 200
+    outputs:
+      nb_total_shots: $response.body#/nb_total_shots
+      nb_iterations: $response.body#/nb_iterations
+      nb_shots_per_job: $response.body#/nb_shots_per_job
+
+  - stepId: check-qt-capacity
+    description: >-
+      Read max_running_qt_jobs / num_running_qt_jobs. The Quantum Toolbox
+      ceiling is enforced as 403 "Cannot have more than {MAX_QT_JOBS} running
+      Quantum Toolbox jobs" — note it is a 403, unlike the Perceval
+      waiting-job ceiling which is a 400.
+    operationId: $sourceDescriptions.apiPercevalJobApi.get_api_jobs_availability
+    successCriteria:
+    - condition: $statusCode == 200
+    outputs:
+      max_running_qt_jobs: $response.body#/max_running_qt_jobs
+      num_running_qt_jobs: $response.body#/num_running_qt_jobs
+
+  - stepId: submit-chemistry-vqe
+    description: >-
+      Submit the workload. There is no idempotency key and no process_id
+      guard on the Toolbox surface, so persist the returned job_id
+      immediately — there is no job list endpoint to recover it from.
+    operationId: $sourceDescriptions.quantumtoolboxApi.post_qt_chemistryvqe
+    requestBody:
+      contentType: application/json
+      payload: $inputs.chemistry_params
+    successCriteria:
+    - condition: $statusCode == 200
+    outputs:
+      job_id: $response.body#/job_id
+
+  - stepId: poll-status
+    description: >-
+      Poll with exponential backoff. VQE status responses can carry
+      IntermediateChemistryVqeResults, so convergence is observable before
+      the job terminates.
+    operationId: $sourceDescriptions.quantumtoolboxApi.get_qt_chemistryvqe_by_job_id_status
+    parameters:
+    - name: job_id
+      in: path
+      value: $steps.submit-chemistry-vqe.outputs.job_id
+    successCriteria:
+    - condition: $statusCode == 200
+    outputs:
+      status: $response.body#/status
+
+  - stepId: get-results
+    description: Collect ChemistryVqeResults.
+    operationId: $sourceDescriptions.quantumtoolboxApi.get_qt_chemistryvqe_by_job_id_results
+    parameters:
+    - name: job_id
+      in: path
+      value: $steps.submit-chemistry-vqe.outputs.job_id
+    successCriteria:
+    - condition: $statusCode == 200
+    outputs:
+      results: $response.body#/results
+
+  - stepId: audit-consumption
+    description: >-
+      Read the per-platform consumption ledger for this token — credits and
+      free_credits are reported separately. The only way to answer "what did
+      this run consume"; note that no price list is published, so cost in
+      currency is not knowable.
+    operationId: $sourceDescriptions.apiPercevalJobTokenApi.get_api_tokens_usage_report
+    successCriteria:
+    - condition: $statusCode == 200
+    outputs:
+      total_jobs: $response.body#/total_jobs
+      usage: $response.body#/usage
+
+  - stepId: revoke-job-token
+    description: Revoke the run's token.
+    operationId: $sourceDescriptions.apiPercevalJobTokenApi.post_api_tokens_revoke
+    requestBody:
+      contentType: application/json
+      payload:
+        token: $steps.mint-job-token.outputs.job_token
+    successCriteria:
+    - condition: $statusCode == 200
+  outputs:
+    estimated_total_shots: $steps.estimate-cost.outputs.nb_total_shots
+    job_id: $steps.submit-chemistry-vqe.outputs.job_id
+    results: $steps.get-results.outputs.results

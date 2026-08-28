@@ -13,174 +13,174 @@ x-source: >-
   https://api.cloud.quandela.com/openapi.json. Every operationId below exists
   verbatim in the referenced specs.
 sourceDescriptions:
-  - name: tokens
-    url: ../openapi/quandela-perceval-job-token-openapi.yml
-    type: openapi
-  - name: jobs
-    url: ../openapi/quandela-perceval-job-openapi.yml
-    type: openapi
+- name: apiPercevalJobApi
+  url: ../openapi/quandela-api-perceval-job-api-openapi.yml
+  type: openapi
+- name: apiPercevalJobTokenApi
+  url: ../openapi/quandela-api-perceval-job-token-api-openapi.yml
+  type: openapi
 workflows:
-  - workflowId: submit-and-collect-perceval-job
-    summary: End-to-end Perceval job execution on Quandela Cloud.
+- workflowId: submit-and-collect-perceval-job
+  summary: End-to-end Perceval job execution on Quandela Cloud.
+  description: >-
+    Quandela Cloud is submit-then-poll — there is no webhook or event surface,
+    so completion must be discovered by polling. There is also no idempotency
+    key, so process_id is supplied on submission as a duplicate guard: on a
+    timeout, re-sending the SAME process_id returns 400 rather than creating a
+    second credit-consuming job.
+  inputs:
+    type: object
+    required: [account_token, job_name, payload]
+    properties:
+      account_token:
+        type: string
+        description: Account access token from account.quandela.com (Bearer).
+      token_label:
+        type: string
+        description: Unique label for the per-run Cloud Job Token.
+        default: arazzo-run
+      token_duration:
+        type: integer
+        description: Requested job-token lifetime in seconds.
+        default: 3600
+      job_name:
+        type: string
+      payload:
+        type: object
+        description: >-
+          Opaque circuit payload serialised by perceval-quandela. The OpenAPI
+          does not describe its structure; build it with the SDK.
+      platform_name:
+        type: string
+        description: >-
+          Namespaced platform. Use a sim: platform to rehearse before spending
+          credits on a qpu: platform.
+        default: 'sim:slos'
+      max_shots:
+        type: integer
+      max_duration:
+        type: integer
+        description: Seconds. Must be non-zero and at most 864000.
+        default: 3600
+      pcvl_version:
+        type: string
+        default: 1.2.4
+      process_id:
+        type: string
+        description: Caller-supplied duplicate guard. NOT an idempotency key.
+  steps:
+  - stepId: mint-job-token
     description: >-
-      Quandela Cloud is submit-then-poll — there is no webhook or event surface,
-      so completion must be discovered by polling. There is also no idempotency
-      key, so process_id is supplied on submission as a duplicate guard: on a
-      timeout, re-sending the SAME process_id returns 400 rather than creating a
-      second credit-consuming job.
-    inputs:
-      type: object
-      required: [account_token, job_name, payload]
-      properties:
-        account_token:
-          type: string
-          description: Account access token from account.quandela.com (Bearer).
-        token_label:
-          type: string
-          description: Unique label for the per-run Cloud Job Token.
-          default: arazzo-run
-        token_duration:
-          type: integer
-          description: Requested job-token lifetime in seconds.
-          default: 3600
-        job_name:
-          type: string
-        payload:
-          type: object
-          description: >-
-            Opaque circuit payload serialised by perceval-quandela. The OpenAPI
-            does not describe its structure; build it with the SDK.
-        platform_name:
-          type: string
-          description: >-
-            Namespaced platform. Use a sim: platform to rehearse before spending
-            credits on a qpu: platform.
-          default: 'sim:slos'
-        max_shots:
-          type: integer
-        max_duration:
-          type: integer
-          description: Seconds. Must be non-zero and at most 864000.
-          default: 3600
-        pcvl_version:
-          type: string
-          default: 1.2.4
-        process_id:
-          type: string
-          description: Caller-supplied duplicate guard. NOT an idempotency key.
-    steps:
-      - stepId: mint-job-token
-        description: >-
-          Mint a short-lived labelled Cloud Job Token for this run. Labels must
-          be unique per account (400 "Label already exists").
-        operationId: $sourceDescriptions.tokens.post_api_tokens
-        requestBody:
-          contentType: application/json
-          payload:
-            label: $inputs.token_label
-            duration: $inputs.token_duration
-            priority: 0
-            is_explorer_token: false
-        successCriteria:
-          - condition: $statusCode == 200
-        outputs:
-          job_token: $response.body#/token
-          job_token_id: $response.body#/token_id
-
-      - stepId: check-availability
-        description: >-
-          Read the account's concrete concurrency ceilings and current usage.
-          This is the only place the {MAX_WAITING_JOBS} / {MAX_QT_JOBS} values
-          referenced by the 400/403 error text become numbers — the API sends no
-          RateLimit-* headers.
-        operationId: $sourceDescriptions.jobs.get_api_jobs_availability
-        successCriteria:
-          - condition: $statusCode == 200
-        outputs:
-          max_jobs_in_queue: $response.body#/max_jobs_in_queue
-          num_jobs_in_queue: $response.body#/num_jobs_in_queue
-          max_concurrent_jobs: $response.body#/max_concurrent_jobs
-          num_concurrent_jobs: $response.body#/num_concurrent_jobs
-
-      - stepId: submit-job
-        description: >-
-          Create the job. Supply exactly one of platform_name or platform_id or
-          the call fails with 400 "Require platform_id or platform_name".
-        operationId: $sourceDescriptions.jobs.post_api_jobs
-        requestBody:
-          contentType: application/json
-          payload:
-            job_name: $inputs.job_name
-            payload: $inputs.payload
-            platform_name: $inputs.platform_name
-            max_duration: $inputs.max_duration
-            pcvl_version: $inputs.pcvl_version
-            process_id: $inputs.process_id
-        successCriteria:
-          - condition: $statusCode == 200
-        outputs:
-          job_id: $response.body#/job_id
-
-      - stepId: poll-status
-        description: >-
-          Poll until the job leaves its running state. Re-enter this step with
-          exponential backoff; there is no Retry-After header to obey.
-          last_intermediate_results carries partial progress before completion.
-        operationId: $sourceDescriptions.jobs.get_api_jobs_by_job_id_status
-        parameters:
-          - name: job_id
-            in: path
-            value: $steps.submit-job.outputs.job_id
-        successCriteria:
-          - condition: $statusCode == 200
-        outputs:
-          status: $response.body#/status
-          progress: $response.body#/progress
-          failure_code: $response.body#/failure_code
-
-      - stepId: get-result
-        description: Retrieve the terminal result. Branch on results_type to interpret results.
-        operationId: $sourceDescriptions.jobs.get_api_jobs_by_job_id_result
-        parameters:
-          - name: job_id
-            in: path
-            value: $steps.submit-job.outputs.job_id
-        successCriteria:
-          - condition: $statusCode == 200
-        outputs:
-          results: $response.body#/results
-          results_type: $response.body#/results_type
-          shots: $response.body#/shots
-          duration: $response.body#/duration
-
-      - stepId: get-job-data
-        description: >-
-          Fetch the full submission record for audit — command, platform_name,
-          pcvl_version, token_label, rerun_from.
-        operationId: $sourceDescriptions.jobs.get_api_jobs_by_job_id_data
-        parameters:
-          - name: job_id
-            in: path
-            value: $steps.submit-job.outputs.job_id
-        successCriteria:
-          - condition: $statusCode == 200
-        outputs:
-          platform_name: $response.body#/platform_name
-          token_label: $response.body#/token_label
-          command: $response.body#/command
-
-      - stepId: revoke-job-token
-        description: >-
-          Revoke the run's token. Revocation is reversible via
-          post_api_tokens_reopen; use post_api_tokens_delete_by_ids to destroy it.
-        operationId: $sourceDescriptions.tokens.post_api_tokens_revoke
-        requestBody:
-          contentType: application/json
-          payload:
-            token: $steps.mint-job-token.outputs.job_token
-        successCriteria:
-          - condition: $statusCode == 200
+      Mint a short-lived labelled Cloud Job Token for this run. Labels must
+      be unique per account (400 "Label already exists").
+    operationId: $sourceDescriptions.apiPercevalJobTokenApi.post_api_tokens
+    requestBody:
+      contentType: application/json
+      payload:
+        label: $inputs.token_label
+        duration: $inputs.token_duration
+        priority: 0
+        is_explorer_token: false
+    successCriteria:
+    - condition: $statusCode == 200
     outputs:
-      job_id: $steps.submit-job.outputs.job_id
-      results: $steps.get-result.outputs.results
-      results_type: $steps.get-result.outputs.results_type
+      job_token: $response.body#/token
+      job_token_id: $response.body#/token_id
+
+  - stepId: check-availability
+    description: >-
+      Read the account's concrete concurrency ceilings and current usage.
+      This is the only place the {MAX_WAITING_JOBS} / {MAX_QT_JOBS} values
+      referenced by the 400/403 error text become numbers — the API sends no
+      RateLimit-* headers.
+    operationId: $sourceDescriptions.apiPercevalJobApi.get_api_jobs_availability
+    successCriteria:
+    - condition: $statusCode == 200
+    outputs:
+      max_jobs_in_queue: $response.body#/max_jobs_in_queue
+      num_jobs_in_queue: $response.body#/num_jobs_in_queue
+      max_concurrent_jobs: $response.body#/max_concurrent_jobs
+      num_concurrent_jobs: $response.body#/num_concurrent_jobs
+
+  - stepId: submit-job
+    description: >-
+      Create the job. Supply exactly one of platform_name or platform_id or
+      the call fails with 400 "Require platform_id or platform_name".
+    operationId: $sourceDescriptions.apiPercevalJobApi.post_api_jobs
+    requestBody:
+      contentType: application/json
+      payload:
+        job_name: $inputs.job_name
+        payload: $inputs.payload
+        platform_name: $inputs.platform_name
+        max_duration: $inputs.max_duration
+        pcvl_version: $inputs.pcvl_version
+        process_id: $inputs.process_id
+    successCriteria:
+    - condition: $statusCode == 200
+    outputs:
+      job_id: $response.body#/job_id
+
+  - stepId: poll-status
+    description: >-
+      Poll until the job leaves its running state. Re-enter this step with
+      exponential backoff; there is no Retry-After header to obey.
+      last_intermediate_results carries partial progress before completion.
+    operationId: $sourceDescriptions.apiPercevalJobApi.get_api_jobs_by_job_id_status
+    parameters:
+    - name: job_id
+      in: path
+      value: $steps.submit-job.outputs.job_id
+    successCriteria:
+    - condition: $statusCode == 200
+    outputs:
+      status: $response.body#/status
+      progress: $response.body#/progress
+      failure_code: $response.body#/failure_code
+
+  - stepId: get-result
+    description: Retrieve the terminal result. Branch on results_type to interpret results.
+    operationId: $sourceDescriptions.apiPercevalJobApi.get_api_jobs_by_job_id_result
+    parameters:
+    - name: job_id
+      in: path
+      value: $steps.submit-job.outputs.job_id
+    successCriteria:
+    - condition: $statusCode == 200
+    outputs:
+      results: $response.body#/results
+      results_type: $response.body#/results_type
+      shots: $response.body#/shots
+      duration: $response.body#/duration
+
+  - stepId: get-job-data
+    description: >-
+      Fetch the full submission record for audit — command, platform_name,
+      pcvl_version, token_label, rerun_from.
+    operationId: $sourceDescriptions.apiPercevalJobApi.get_api_jobs_by_job_id_data
+    parameters:
+    - name: job_id
+      in: path
+      value: $steps.submit-job.outputs.job_id
+    successCriteria:
+    - condition: $statusCode == 200
+    outputs:
+      platform_name: $response.body#/platform_name
+      token_label: $response.body#/token_label
+      command: $response.body#/command
+
+  - stepId: revoke-job-token
+    description: >-
+      Revoke the run's token. Revocation is reversible via
+      post_api_tokens_reopen; use post_api_tokens_delete_by_ids to destroy it.
+    operationId: $sourceDescriptions.apiPercevalJobTokenApi.post_api_tokens_revoke
+    requestBody:
+      contentType: application/json
+      payload:
+        token: $steps.mint-job-token.outputs.job_token
+    successCriteria:
+    - condition: $statusCode == 200
+  outputs:
+    job_id: $steps.submit-job.outputs.job_id
+    results: $steps.get-result.outputs.results
+    results_type: $steps.get-result.outputs.results_type

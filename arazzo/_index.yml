@@ -1,6 +1,6 @@
-generated: '2026-08-17'
-method: derived
-source: >-
+x-generated: '2026-08-17'
+x-method: derived
+x-source: >-
   Derived from the arazzo/*.yml files in this directory. Every step operationId
   is verified present in the referenced openapi/ document; the operationIds
   themselves are derived (Quandela's published spec ships none) and the

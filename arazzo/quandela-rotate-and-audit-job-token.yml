@@ -19,147 +19,147 @@ x-note: >-
   and delete are all API operations, rotation is fully automatable without a
   human. Revocation is reversible (reopen) which is unusual; deletion is not.
 sourceDescriptions:
-  - name: tokens
-    url: ../openapi/quandela-perceval-job-token-openapi.yml
-    type: openapi
+- name: apiPercevalJobTokenApi
+  url: ../openapi/quandela-api-perceval-job-token-api-openapi.yml
+  type: openapi
 workflows:
-  - workflowId: rotate-and-audit-job-token
-    summary: Replace a Cloud Job Token, capturing its consumption before destroying it.
-    inputs:
-      type: object
-      required: [account_token, outgoing_token_id, new_token_label]
-      properties:
-        account_token:
-          type: string
-          description: Account access token from account.quandela.com (Bearer).
-        outgoing_token_id:
-          type: string
-          description: token_id of the credential being retired.
-        outgoing_token:
-          type: string
-          description: The outgoing token value, required by the revoke body.
-        new_token_label:
-          type: string
-          description: Must be unique per account (400 "Label already exists").
-        new_token_priority:
-          type: integer
-          description: >-
-            Cannot exceed the caller's own user priority (400 "Can't assign
-            priority higher than user priority").
-          default: 0
-        audit_start_time:
-          type: string
-        audit_end_time:
-          type: string
-    steps:
-      - stepId: inspect-outgoing-token
+- workflowId: rotate-and-audit-job-token
+  summary: Replace a Cloud Job Token, capturing its consumption before destroying it.
+  inputs:
+    type: object
+    required: [account_token, outgoing_token_id, new_token_label]
+    properties:
+      account_token:
+        type: string
+        description: Account access token from account.quandela.com (Bearer).
+      outgoing_token_id:
+        type: string
+        description: token_id of the credential being retired.
+      outgoing_token:
+        type: string
+        description: The outgoing token value, required by the revoke body.
+      new_token_label:
+        type: string
+        description: Must be unique per account (400 "Label already exists").
+      new_token_priority:
+        type: integer
         description: >-
-          Read the full Token object — valid, is_revoked, is_explorer_token,
-          is_apikey, priority, user_priority, expiration_date, last_used_time,
-          count — before changing anything.
-        operationId: $sourceDescriptions.tokens.get_api_tokens_by_token_id
-        parameters:
-          - name: token_id
-            in: path
-            value: $inputs.outgoing_token_id
-        successCriteria:
-          - condition: $statusCode == 200
-        outputs:
-          label: $response.body#/label
-          priority: $response.body#/priority
-          valid: $response.body#/valid
-          last_used_time: $response.body#/last_used_time
-          expiration_date: $response.body#/expiration_date
-
-      - stepId: capture-usage
-        description: >-
-          Capture the outgoing token's consumption ledger BEFORE deletion —
-          per-platform nb_jobs, duration_seconds, credits and free_credits. Once
-          the token is deleted this history is no longer addressable by token_id.
-        operationId: $sourceDescriptions.tokens.get_api_tokens_usage_report
-        parameters:
-          - name: token_ids
-            in: query
-            value: $inputs.outgoing_token_id
-          - name: start_time
-            in: query
-            value: $inputs.audit_start_time
-          - name: end_time
-            in: query
-            value: $inputs.audit_end_time
-        successCriteria:
-          - condition: $statusCode == 200
-        outputs:
-          total_jobs: $response.body#/total_jobs
-          usage: $response.body#/usage
-
-      - stepId: mint-replacement-token
-        description: >-
-          Mint the replacement first, so the account is never without a working
-          job credential.
-        operationId: $sourceDescriptions.tokens.post_api_tokens
-        requestBody:
-          contentType: application/json
-          payload:
-            label: $inputs.new_token_label
-            priority: $inputs.new_token_priority
-            duration: 3600
-            is_explorer_token: false
-        successCriteria:
-          - condition: $statusCode == 200
-        outputs:
-          new_token: $response.body#/token
-          new_token_id: $response.body#/token_id
-          new_token_duration: $response.body#/duration
-
-      - stepId: verify-replacement-listed
-        description: >-
-          Confirm the new token is present and active. This is the API's only
-          paginated collection — limit/offset, no cursor.
-        operationId: $sourceDescriptions.tokens.get_api_tokens
-        parameters:
-          - name: limit
-            in: query
-            value: 50
-          - name: offset
-            in: query
-            value: 0
-          - name: include_revoked
-            in: query
-            value: false
-          - name: include_expired
-            in: query
-            value: false
-        successCriteria:
-          - condition: $statusCode == 200
-
-      - stepId: revoke-outgoing-token
-        description: >-
-          Suspend the outgoing token. Reversible via
-          post_api_tokens_reopen if the cutover needs rolling back.
-        operationId: $sourceDescriptions.tokens.post_api_tokens_revoke
-        requestBody:
-          contentType: application/json
-          payload:
-            token: $inputs.outgoing_token
-        successCriteria:
-          - condition: $statusCode == 200
-
-      - stepId: delete-outgoing-token
-        description: >-
-          Permanently delete the retired token. Fails with 400 "Tokens not found
-          | Can't delete the current active token" if it is the credential in
-          use, and 403 if it belongs to another user. Run only after the
-          replacement is confirmed working.
-        operationId: $sourceDescriptions.tokens.post_api_tokens_delete_by_ids
-        requestBody:
-          contentType: application/json
-          payload:
-            token_ids:
-              - $inputs.outgoing_token_id
-        successCriteria:
-          - condition: $statusCode == 200
+          Cannot exceed the caller's own user priority (400 "Can't assign
+          priority higher than user priority").
+        default: 0
+      audit_start_time:
+        type: string
+      audit_end_time:
+        type: string
+  steps:
+  - stepId: inspect-outgoing-token
+    description: >-
+      Read the full Token object — valid, is_revoked, is_explorer_token,
+      is_apikey, priority, user_priority, expiration_date, last_used_time,
+      count — before changing anything.
+    operationId: $sourceDescriptions.apiPercevalJobTokenApi.get_api_tokens_by_token_id
+    parameters:
+    - name: token_id
+      in: path
+      value: $inputs.outgoing_token_id
+    successCriteria:
+    - condition: $statusCode == 200
     outputs:
-      new_token_id: $steps.mint-replacement-token.outputs.new_token_id
-      retired_token_usage: $steps.capture-usage.outputs.usage
-      retired_token_total_jobs: $steps.capture-usage.outputs.total_jobs
+      label: $response.body#/label
+      priority: $response.body#/priority
+      valid: $response.body#/valid
+      last_used_time: $response.body#/last_used_time
+      expiration_date: $response.body#/expiration_date
+
+  - stepId: capture-usage
+    description: >-
+      Capture the outgoing token's consumption ledger BEFORE deletion —
+      per-platform nb_jobs, duration_seconds, credits and free_credits. Once
+      the token is deleted this history is no longer addressable by token_id.
+    operationId: $sourceDescriptions.apiPercevalJobTokenApi.get_api_tokens_usage_report
+    parameters:
+    - name: token_ids
+      in: query
+      value: $inputs.outgoing_token_id
+    - name: start_time
+      in: query
+      value: $inputs.audit_start_time
+    - name: end_time
+      in: query
+      value: $inputs.audit_end_time
+    successCriteria:
+    - condition: $statusCode == 200
+    outputs:
+      total_jobs: $response.body#/total_jobs
+      usage: $response.body#/usage
+
+  - stepId: mint-replacement-token
+    description: >-
+      Mint the replacement first, so the account is never without a working
+      job credential.
+    operationId: $sourceDescriptions.apiPercevalJobTokenApi.post_api_tokens
+    requestBody:
+      contentType: application/json
+      payload:
+        label: $inputs.new_token_label
+        priority: $inputs.new_token_priority
+        duration: 3600
+        is_explorer_token: false
+    successCriteria:
+    - condition: $statusCode == 200
+    outputs:
+      new_token: $response.body#/token
+      new_token_id: $response.body#/token_id
+      new_token_duration: $response.body#/duration
+
+  - stepId: verify-replacement-listed
+    description: >-
+      Confirm the new token is present and active. This is the API's only
+      paginated collection — limit/offset, no cursor.
+    operationId: $sourceDescriptions.apiPercevalJobTokenApi.get_api_tokens
+    parameters:
+    - name: limit
+      in: query
+      value: 50
+    - name: offset
+      in: query
+      value: 0
+    - name: include_revoked
+      in: query
+      value: false
+    - name: include_expired
+      in: query
+      value: false
+    successCriteria:
+    - condition: $statusCode == 200
+
+  - stepId: revoke-outgoing-token
+    description: >-
+      Suspend the outgoing token. Reversible via
+      post_api_tokens_reopen if the cutover needs rolling back.
+    operationId: $sourceDescriptions.apiPercevalJobTokenApi.post_api_tokens_revoke
+    requestBody:
+      contentType: application/json
+      payload:
+        token: $inputs.outgoing_token
+    successCriteria:
+    - condition: $statusCode == 200
+
+  - stepId: delete-outgoing-token
+    description: >-
+      Permanently delete the retired token. Fails with 400 "Tokens not found
+      | Can't delete the current active token" if it is the credential in
+      use, and 403 if it belongs to another user. Run only after the
+      replacement is confirmed working.
+    operationId: $sourceDescriptions.apiPercevalJobTokenApi.post_api_tokens_delete_by_ids
+    requestBody:
+      contentType: application/json
+      payload:
+        token_ids:
+        - $inputs.outgoing_token_id
+    successCriteria:
+    - condition: $statusCode == 200
+  outputs:
+    new_token_id: $steps.mint-replacement-token.outputs.new_token_id
+    retired_token_usage: $steps.capture-usage.outputs.usage
+    retired_token_total_jobs: $steps.capture-usage.outputs.total_jobs
