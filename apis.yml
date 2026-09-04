@@ -60,7 +60,7 @@ accessModel:
     JS-rendered shell and every machine-readable pricing endpoint probed 404s.
     Billing is prepaid credits metered per platform. See
     plans/quandela-plans-pricing.yml.
-position: Provider
+position: Producing
 access: 3rd-Party
 image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/quandela.png
 tags:
