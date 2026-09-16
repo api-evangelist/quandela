@@ -182,32 +182,6 @@ apis:
     url: sandbox/quandela-sandbox.yml
   - type: Documentation
     url: https://hub.quandela.com/integrate
-- aid: quandela:quandela-platform-api
-  name: Quandela Platform API
-  description: Service root, health check and specification endpoints
-  humanURL: https://cloud.quandela.com/
-  baseURL: https://api.cloud.quandela.com/
-  tags:
-  - Platform
-  properties:
-  - type: OpenAPI
-    url: openapi/quandela-platform-api-openapi.yml
-  - type: Documentation
-    url: https://perceval.quandela.net/docs/v1.2/reference/providers.html
-  - type: Authentication
-    url: authentication/quandela-authentication.yml
-  - type: Conventions
-    url: conventions/quandela-conventions.yml
-  - type: ErrorCatalog
-    url: errors/quandela-problem-types.yml
-  - type: DataModel
-    url: data-model/quandela-data-model.yml
-  - type: RateLimits
-    url: rate-limits/quandela-rate-limits.yml
-  - type: Sandbox
-    url: sandbox/quandela-sandbox.yml
-  - type: Documentation
-    url: https://hub.quandela.com/integrate
 - aid: quandela:quandela-qrng-api
   name: Quandela QRNG API
   description: Quantum Random Number generation
@@ -244,6 +218,110 @@ apis:
   properties:
   - type: OpenAPI
     url: openapi/quandela-quantumtoolbox-api-openapi.yml
+  - type: Documentation
+    url: https://perceval.quandela.net/docs/v1.2/reference/providers.html
+  - type: Authentication
+    url: authentication/quandela-authentication.yml
+  - type: Conventions
+    url: conventions/quandela-conventions.yml
+  - type: ErrorCatalog
+    url: errors/quandela-problem-types.yml
+  - type: DataModel
+    url: data-model/quandela-data-model.yml
+  - type: RateLimits
+    url: rate-limits/quandela-rate-limits.yml
+  - type: Sandbox
+    url: sandbox/quandela-sandbox.yml
+  - type: Documentation
+    url: https://hub.quandela.com/integrate
+- aid: quandela:quandela-health-api
+  name: Quandela Health API
+  description: The Health API from Quandela — 1 operation(s) for health.
+  humanURL: https://cloud.quandela.com/
+  baseURL: https://api.cloud.quandela.com/
+  tags:
+  - Health
+  properties:
+  - type: OpenAPI
+    url: openapi/quandela-health-api-openapi.yml
+  - type: Documentation
+    url: https://perceval.quandela.net/docs/v1.2/reference/providers.html
+  - type: Authentication
+    url: authentication/quandela-authentication.yml
+  - type: Conventions
+    url: conventions/quandela-conventions.yml
+  - type: ErrorCatalog
+    url: errors/quandela-problem-types.yml
+  - type: DataModel
+    url: data-model/quandela-data-model.yml
+  - type: RateLimits
+    url: rate-limits/quandela-rate-limits.yml
+  - type: Sandbox
+    url: sandbox/quandela-sandbox.yml
+  - type: Documentation
+    url: https://hub.quandela.com/integrate
+- aid: quandela:quandela-openapi-json-api
+  name: Quandela Openapi.json API
+  description: The Openapi.json API from Quandela — 1 operation(s) for openapi.json.
+  humanURL: https://cloud.quandela.com/
+  baseURL: https://api.cloud.quandela.com/
+  tags:
+  - Openapi.json
+  properties:
+  - type: OpenAPI
+    url: openapi/quandela-openapi-json-api-openapi.yml
+  - type: Documentation
+    url: https://perceval.quandela.net/docs/v1.2/reference/providers.html
+  - type: Authentication
+    url: authentication/quandela-authentication.yml
+  - type: Conventions
+    url: conventions/quandela-conventions.yml
+  - type: ErrorCatalog
+    url: errors/quandela-problem-types.yml
+  - type: DataModel
+    url: data-model/quandela-data-model.yml
+  - type: RateLimits
+    url: rate-limits/quandela-rate-limits.yml
+  - type: Sandbox
+    url: sandbox/quandela-sandbox.yml
+  - type: Documentation
+    url: https://hub.quandela.com/integrate
+- aid: quandela:quandela-qt-openapi-json-api
+  name: Quandela Qt Openapi.json API
+  description: The Qt Openapi.json API from Quandela — 1 operation(s) for qt openapi.json.
+  humanURL: https://cloud.quandela.com/
+  baseURL: https://api.cloud.quandela.com/
+  tags:
+  - Qt Openapi.json
+  properties:
+  - type: OpenAPI
+    url: openapi/quandela-qt-openapi-json-api-openapi.yml
+  - type: Documentation
+    url: https://perceval.quandela.net/docs/v1.2/reference/providers.html
+  - type: Authentication
+    url: authentication/quandela-authentication.yml
+  - type: Conventions
+    url: conventions/quandela-conventions.yml
+  - type: ErrorCatalog
+    url: errors/quandela-problem-types.yml
+  - type: DataModel
+    url: data-model/quandela-data-model.yml
+  - type: RateLimits
+    url: rate-limits/quandela-rate-limits.yml
+  - type: Sandbox
+    url: sandbox/quandela-sandbox.yml
+  - type: Documentation
+    url: https://hub.quandela.com/integrate
+- aid: quandela:quandela-quandela-cloud-api-api
+  name: Quandela Quandela Cloud API
+  description: The Quandela Cloud Api API from Quandela — 1 operation(s) for quandela cloud api.
+  humanURL: https://cloud.quandela.com/
+  baseURL: https://api.cloud.quandela.com/
+  tags:
+  - Quandela Cloud Api
+  properties:
+  - type: OpenAPI
+    url: openapi/quandela-quandela-cloud-api-api-openapi.yml
   - type: Documentation
     url: https://perceval.quandela.net/docs/v1.2/reference/providers.html
   - type: Authentication
