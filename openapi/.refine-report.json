@@ -1,0 +1,52 @@
+{
+  "provider": "quandela",
+  "sources": [
+    "_original/quandela-cloud-openapi.json"
+  ],
+  "outputs": [
+    "quandela-api-job-token-api-openapi.yml",
+    "quandela-api-perceval-job-api-openapi.yml",
+    "quandela-api-perceval-job-token-api-openapi.yml",
+    "quandela-health-api-openapi.yml",
+    "quandela-openapi-json-api-openapi.yml",
+    "quandela-qrng-api-openapi.yml",
+    "quandela-qt-openapi-json-api-openapi.yml",
+    "quandela-quandela-cloud-api-api-openapi.yml",
+    "quandela-quantumtoolbox-api-openapi.yml"
+  ],
+  "archived": [],
+  "errors": [],
+  "warnings": [],
+  "notes": [
+    "7 archived document(s) dropped as subsets of other archived documents",
+    "sourced from openapi/_original/ (1 archived document(s)); previously refined output at the top level was skipped rather than re-split",
+    "quandela-cloud-openapi.json: upgraded openapi 3.0.3 -> OpenAPI 3.2.0",
+    "quandela-cloud-openapi.json: tagged paths GET / -> Quandela Cloud Api",
+    "quandela-cloud-openapi.json: tagged paths GET /health -> Health",
+    "quandela-cloud-openapi.json: tagged paths GET /openapi.json -> Openapi.json",
+    "quandela-cloud-openapi.json: tagged paths GET /qt-openapi.json -> Qt Openapi.json",
+    "quandela-cloud-openapi.json: declared missing tag: Health",
+    "quandela-cloud-openapi.json: declared missing tag: Openapi.json",
+    "quandela-cloud-openapi.json: declared missing tag: Qt Openapi.json",
+    "quandela-cloud-openapi.json: declared missing tag: Quandela Cloud Api",
+    "apis.yml register: already-registered"
+  ],
+  "skipped": [
+    "_original/quandela-quantum-toolbox-openapi.yml: archived document superseded by a larger archived document",
+    "_original/quandela-quantum-toolbox-openapi.json: archived document superseded by a larger archived document",
+    "_original/quandela-qrng-openapi.yml: archived document superseded by a larger archived document",
+    "_original/quandela-platform-openapi.yml: archived document superseded by a larger archived document",
+    "_original/quandela-perceval-job-token-openapi.yml: archived document superseded by a larger archived document",
+    "_original/quandela-perceval-job-openapi.yml: archived document superseded by a larger archived document",
+    "_original/quandela-job-token-openapi.yml: archived document superseded by a larger archived document",
+    "quandela-api-job-token-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "quandela-api-perceval-job-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "quandela-api-perceval-job-token-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "quandela-health-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "quandela-openapi-json-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "quandela-qrng-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "quandela-qt-openapi-json-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "quandela-quandela-cloud-api-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "quandela-quantumtoolbox-api-openapi.yml: previously refined output, superseded by openapi/_original/"
+  ]
+}
