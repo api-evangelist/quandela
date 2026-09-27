@@ -609,6 +609,16 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
+    ListTokenIds:
+      additionalProperties: true
+      properties:
+        token_ids:
+          items:
+            type: integer
+          type: array
+      required:
+      - token_ids
+      type: object
     Token:
       additionalProperties: true
       properties:
@@ -714,40 +724,20 @@ components:
           - boolean
           - 'null'
       type: object
-    TokenGenerateRequest:
-      additionalProperties: true
+    ValidationError:
       properties:
-        duration:
-          default: 86400
-          description: Duration of access token in seconds
-          example: 86400
-          type:
-          - integer
-          - 'null'
-        is_explorer_token:
-          type:
-          - boolean
-          - 'null'
-        label:
-          default: unknown
-          description: Label of the token
-          example: unknown
-          type:
-          - string
-          - 'null'
-        priority:
-          default: 0
-          description: Number presenting the priority, must be lower than the user's priority, default is 0
-          example: 1
-          type:
-          - integer
-          - 'null'
-        user_id:
-          description: ID of the User, default is id of current user
-          example: 1
-          type:
-          - integer
-          - 'null'
+        detail:
+          properties:
+            <location>:
+              properties:
+                <field_name>:
+                  items:
+                    type: string
+                  type: array
+              type: object
+          type: object
+        message:
+          type: string
       type: object
     TokenGenerateResponse:
       additionalProperties: true
@@ -769,40 +759,6 @@ components:
           - integer
           - 'null'
       type: object
-    DefaultResponse:
-      additionalProperties: true
-      properties:
-        message:
-          example: ok
-          type:
-          - string
-          - 'null'
-      type: object
-    ValidationError:
-      properties:
-        detail:
-          properties:
-            <location>:
-              properties:
-                <field_name>:
-                  items:
-                    type: string
-                  type: array
-              type: object
-          type: object
-        message:
-          type: string
-      type: object
-    ListTokenIds:
-      additionalProperties: true
-      properties:
-        token_ids:
-          items:
-            type: integer
-          type: array
-      required:
-      - token_ids
-      type: object
     HTTPError:
       properties:
         detail:
@@ -810,22 +766,14 @@ components:
         error:
           type: string
       type: object
-    TokenUpdate:
+    RevokeToken:
       additionalProperties: true
       properties:
-        label:
-          default: unknown
-          description: Label of the token
-          example: unknown
-          type:
-          - string
-          - 'null'
-        priority:
-          description: Number presenting the priority, must be lower than the user's priority, default is 0
-          example: 1
-          type:
-          - integer
-          - 'null'
+        token:
+          example: _T_eyJhbGciOiJIUzUxMiIsImlhdCI6MTY3MTg0ODU0NSwiZXhwIjoxNjc0NDQwNT
+          type: string
+      required:
+      - token
       type: object
     TokensListUnitResponse:
       additionalProperties: true
@@ -874,14 +822,66 @@ components:
           - integer
           - 'null'
       type: object
-    RevokeToken:
+    TokenGenerateRequest:
       additionalProperties: true
       properties:
-        token:
-          example: _T_eyJhbGciOiJIUzUxMiIsImlhdCI6MTY3MTg0ODU0NSwiZXhwIjoxNjc0NDQwNT
-          type: string
-      required:
-      - token
+        duration:
+          default: 86400
+          description: Duration of access token in seconds
+          example: 86400
+          type:
+          - integer
+          - 'null'
+        is_explorer_token:
+          type:
+          - boolean
+          - 'null'
+        label:
+          default: unknown
+          description: Label of the token
+          example: unknown
+          type:
+          - string
+          - 'null'
+        priority:
+          default: 0
+          description: Number presenting the priority, must be lower than the user's priority, default is 0
+          example: 1
+          type:
+          - integer
+          - 'null'
+        user_id:
+          description: ID of the User, default is id of current user
+          example: 1
+          type:
+          - integer
+          - 'null'
+      type: object
+    DefaultResponse:
+      additionalProperties: true
+      properties:
+        message:
+          example: ok
+          type:
+          - string
+          - 'null'
+      type: object
+    TokenUpdate:
+      additionalProperties: true
+      properties:
+        label:
+          default: unknown
+          description: Label of the token
+          example: unknown
+          type:
+          - string
+          - 'null'
+        priority:
+          description: Number presenting the priority, must be lower than the user's priority, default is 0
+          example: 1
+          type:
+          - integer
+          - 'null'
       type: object
   securitySchemes:
     BearerAuth:

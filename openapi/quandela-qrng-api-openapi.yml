@@ -134,21 +134,6 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
-    ValidationError:
-      properties:
-        detail:
-          properties:
-            <location>:
-              properties:
-                <field_name>:
-                  items:
-                    type: string
-                  type: array
-              type: object
-          type: object
-        message:
-          type: string
-      type: object
     QrngBytesOutput:
       additionalProperties: false
       properties:
@@ -179,6 +164,28 @@ components:
       - id
       - min_entropy
       type: object
+    ValidationError:
+      properties:
+        detail:
+          properties:
+            <location>:
+              properties:
+                <field_name>:
+                  items:
+                    type: string
+                  type: array
+              type: object
+          type: object
+        message:
+          type: string
+      type: object
+    HTTPError:
+      properties:
+        detail:
+          type: object
+        error:
+          type: string
+      type: object
     QrngIntsOutput:
       additionalProperties: false
       properties:
@@ -189,13 +196,6 @@ components:
           type: array
       required:
       - jobs
-      type: object
-    HTTPError:
-      properties:
-        detail:
-          type: object
-        error:
-          type: string
       type: object
     JobInts:
       additionalProperties: false
