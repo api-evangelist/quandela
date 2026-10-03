@@ -609,15 +609,14 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
-    ListTokenIds:
+    RevokeToken:
       additionalProperties: true
       properties:
-        token_ids:
-          items:
-            type: integer
-          type: array
+        token:
+          example: _T_eyJhbGciOiJIUzUxMiIsImlhdCI6MTY3MTg0ODU0NSwiZXhwIjoxNjc0NDQwNT
+          type: string
       required:
-      - token_ids
+      - token
       type: object
     Token:
       additionalProperties: true
@@ -724,21 +723,6 @@ components:
           - boolean
           - 'null'
       type: object
-    ValidationError:
-      properties:
-        detail:
-          properties:
-            <location>:
-              properties:
-                <field_name>:
-                  items:
-                    type: string
-                  type: array
-              type: object
-          type: object
-        message:
-          type: string
-      type: object
     TokenGenerateResponse:
       additionalProperties: true
       properties:
@@ -759,21 +743,15 @@ components:
           - integer
           - 'null'
       type: object
-    HTTPError:
-      properties:
-        detail:
-          type: object
-        error:
-          type: string
-      type: object
-    RevokeToken:
+    ListTokenIds:
       additionalProperties: true
       properties:
-        token:
-          example: _T_eyJhbGciOiJIUzUxMiIsImlhdCI6MTY3MTg0ODU0NSwiZXhwIjoxNjc0NDQwNT
-          type: string
+        token_ids:
+          items:
+            type: integer
+          type: array
       required:
-      - token
+      - token_ids
       type: object
     TokensListUnitResponse:
       additionalProperties: true
@@ -822,6 +800,45 @@ components:
           - integer
           - 'null'
       type: object
+    TokenUpdate:
+      additionalProperties: true
+      properties:
+        label:
+          default: unknown
+          description: Label of the token
+          example: unknown
+          type:
+          - string
+          - 'null'
+        priority:
+          description: Number presenting the priority, must be lower than the user's priority, default is 0
+          example: 1
+          type:
+          - integer
+          - 'null'
+      type: object
+    HTTPError:
+      properties:
+        detail:
+          type: object
+        error:
+          type: string
+      type: object
+    ValidationError:
+      properties:
+        detail:
+          properties:
+            <location>:
+              properties:
+                <field_name>:
+                  items:
+                    type: string
+                  type: array
+              type: object
+          type: object
+        message:
+          type: string
+      type: object
     TokenGenerateRequest:
       additionalProperties: true
       properties:
@@ -864,23 +881,6 @@ components:
           example: ok
           type:
           - string
-          - 'null'
-      type: object
-    TokenUpdate:
-      additionalProperties: true
-      properties:
-        label:
-          default: unknown
-          description: Label of the token
-          example: unknown
-          type:
-          - string
-          - 'null'
-        priority:
-          description: Number presenting the priority, must be lower than the user's priority, default is 0
-          example: 1
-          type:
-          - integer
           - 'null'
       type: object
   securitySchemes:

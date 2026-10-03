@@ -692,6 +692,46 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
+    RevokeToken:
+      additionalProperties: true
+      properties:
+        token:
+          example: _T_eyJhbGciOiJIUzUxMiIsImlhdCI6MTY3MTg0ODU0NSwiZXhwIjoxNjc0NDQwNT
+          type: string
+      required:
+      - token
+      type: object
+    DeleteTokensByKey:
+      additionalProperties: true
+      properties:
+        tokens:
+          items:
+            type: string
+          type:
+          - array
+          - 'null'
+      type: object
+    TokenUsageResponse:
+      additionalProperties: true
+      properties:
+        token_id:
+          description: ID of the token
+          type:
+          - integer
+          - 'null'
+        total_jobs:
+          description: Total number of jobs executed across all platforms
+          type:
+          - integer
+          - 'null'
+        usage:
+          description: List of usage statistics grouped by platform
+          items:
+            $ref: '#/components/schemas/TokenUsageUnit'
+          type:
+          - array
+          - 'null'
+      type: object
     Token:
       additionalProperties: true
       properties:
@@ -797,31 +837,6 @@ components:
           - boolean
           - 'null'
       type: object
-    ListTokenIds:
-      additionalProperties: true
-      properties:
-        token_ids:
-          items:
-            type: integer
-          type: array
-      required:
-      - token_ids
-      type: object
-    ValidationError:
-      properties:
-        detail:
-          properties:
-            <location>:
-              properties:
-                <field_name>:
-                  items:
-                    type: string
-                  type: array
-              type: object
-          type: object
-        message:
-          type: string
-      type: object
     TokenGenerateResponse:
       additionalProperties: true
       properties:
@@ -842,71 +857,15 @@ components:
           - integer
           - 'null'
       type: object
-    HTTPError:
-      properties:
-        detail:
-          type: object
-        error:
-          type: string
-      type: object
-    RevokeToken:
+    ListTokenIds:
       additionalProperties: true
       properties:
-        token:
-          example: _T_eyJhbGciOiJIUzUxMiIsImlhdCI6MTY3MTg0ODU0NSwiZXhwIjoxNjc0NDQwNT
-          type: string
-      required:
-      - token
-      type: object
-    TokenUsageUnit:
-      additionalProperties: true
-      properties:
-        credits:
-          description: Total credits consumed on this platform
-          type:
-          - number
-          - 'null'
-        duration_seconds:
-          description: Total execution time on this platform, measured in seconds
-          type:
-          - integer
-          - 'null'
-        free_credits:
-          description: Total free credits consumed on this platform
-          type:
-          - number
-          - 'null'
-        nb_jobs:
-          description: Number of jobs executed on this platform
-          type:
-          - integer
-          - 'null'
-        platform_name:
-          description: Platform identifier where the token was used (e.g. qpu:belenos, sim:gpu)
-          type:
-          - string
-          - 'null'
-      type: object
-    TokenUsageResponse:
-      additionalProperties: true
-      properties:
-        token_id:
-          description: ID of the token
-          type:
-          - integer
-          - 'null'
-        total_jobs:
-          description: Total number of jobs executed across all platforms
-          type:
-          - integer
-          - 'null'
-        usage:
-          description: List of usage statistics grouped by platform
+        token_ids:
           items:
-            $ref: '#/components/schemas/TokenUsageUnit'
-          type:
-          - array
-          - 'null'
+            type: integer
+          type: array
+      required:
+      - token_ids
       type: object
     TokensListUnitResponse:
       additionalProperties: true
@@ -955,15 +914,73 @@ components:
           - integer
           - 'null'
       type: object
-    DeleteTokensByKey:
+    TokenUsageUnit:
       additionalProperties: true
       properties:
-        tokens:
-          items:
-            type: string
+        credits:
+          description: Total credits consumed on this platform
           type:
-          - array
+          - number
           - 'null'
+        duration_seconds:
+          description: Total execution time on this platform, measured in seconds
+          type:
+          - integer
+          - 'null'
+        free_credits:
+          description: Total free credits consumed on this platform
+          type:
+          - number
+          - 'null'
+        nb_jobs:
+          description: Number of jobs executed on this platform
+          type:
+          - integer
+          - 'null'
+        platform_name:
+          description: Platform identifier where the token was used (e.g. qpu:belenos, sim:gpu)
+          type:
+          - string
+          - 'null'
+      type: object
+    TokenUpdate:
+      additionalProperties: true
+      properties:
+        label:
+          default: unknown
+          description: Label of the token
+          example: unknown
+          type:
+          - string
+          - 'null'
+        priority:
+          description: Number presenting the priority, must be lower than the user's priority, default is 0
+          example: 1
+          type:
+          - integer
+          - 'null'
+      type: object
+    HTTPError:
+      properties:
+        detail:
+          type: object
+        error:
+          type: string
+      type: object
+    ValidationError:
+      properties:
+        detail:
+          properties:
+            <location>:
+              properties:
+                <field_name>:
+                  items:
+                    type: string
+                  type: array
+              type: object
+          type: object
+        message:
+          type: string
       type: object
     TokenGenerateRequest:
       additionalProperties: true
@@ -1007,23 +1024,6 @@ components:
           example: ok
           type:
           - string
-          - 'null'
-      type: object
-    TokenUpdate:
-      additionalProperties: true
-      properties:
-        label:
-          default: unknown
-          description: Label of the token
-          example: unknown
-          type:
-          - string
-          - 'null'
-        priority:
-          description: Number presenting the priority, must be lower than the user's priority, default is 0
-          example: 1
-          type:
-          - integer
           - 'null'
       type: object
   securitySchemes:

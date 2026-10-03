@@ -145,24 +145,23 @@ components:
       required:
       - jobs
       type: object
-    JobBytes:
+    QrngIntsOutput:
       additionalProperties: false
       properties:
-        bytes:
-          description: Random bytes in base64
-        chsh:
-          description: CHSH value (0 to 2 sqrt(2)
-          type: number
-        id:
-          description: Job ID in UUID format
-          type: string
-        min_entropy:
-          description: Minimum Entropy
-          type: number
+        jobs:
+          description: Jobs used to generate random ints
+          items:
+            $ref: '#/components/schemas/JobInts'
+          type: array
       required:
-      - chsh
-      - id
-      - min_entropy
+      - jobs
+      type: object
+    HTTPError:
+      properties:
+        detail:
+          type: object
+        error:
+          type: string
       type: object
     ValidationError:
       properties:
@@ -179,24 +178,6 @@ components:
         message:
           type: string
       type: object
-    HTTPError:
-      properties:
-        detail:
-          type: object
-        error:
-          type: string
-      type: object
-    QrngIntsOutput:
-      additionalProperties: false
-      properties:
-        jobs:
-          description: Jobs used to generate random ints
-          items:
-            $ref: '#/components/schemas/JobInts'
-          type: array
-      required:
-      - jobs
-      type: object
     JobInts:
       additionalProperties: false
       properties:
@@ -210,6 +191,25 @@ components:
           items:
             type: integer
           type: array
+        min_entropy:
+          description: Minimum Entropy
+          type: number
+      required:
+      - chsh
+      - id
+      - min_entropy
+      type: object
+    JobBytes:
+      additionalProperties: false
+      properties:
+        bytes:
+          description: Random bytes in base64
+        chsh:
+          description: CHSH value (0 to 2 sqrt(2)
+          type: number
+        id:
+          description: Job ID in UUID format
+          type: string
         min_entropy:
           description: Minimum Entropy
           type: number

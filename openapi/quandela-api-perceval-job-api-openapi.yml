@@ -671,6 +671,50 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
+    JobResult:
+      additionalProperties: true
+      properties:
+        duration:
+          description: Duration
+          example: 1
+          type:
+          - integer
+          - 'null'
+        intermediate_results:
+          description: Intermediate Results
+          items:
+            additionalProperties: {}
+            example:
+              key: value
+            type: object
+          type:
+          - array
+          - 'null'
+        job_id:
+          description: Job ID
+          example: 5f8b9b0c-4b1c-4b1c-9b0c-4b1c4b1c4b1c
+          type:
+          - string
+          - 'null'
+        results:
+          description: Result as JSON string
+          example: '{"key":"value"}'
+          type:
+          - string
+          - 'null'
+        results_type:
+          description: Job result type
+          example: test
+          type:
+          - string
+          - 'null'
+        shots:
+          description: Number of shots
+          example: 100
+          type:
+          - integer
+          - 'null'
+      type: object
     GetJobDataResonse:
       additionalProperties: true
       properties:
@@ -739,70 +783,6 @@ components:
           - integer
           - 'null'
         token_label:
-          type:
-          - string
-          - 'null'
-      type: object
-    ValidationError:
-      properties:
-        detail:
-          properties:
-            <location>:
-              properties:
-                <field_name>:
-                  items:
-                    type: string
-                  type: array
-              type: object
-          type: object
-        message:
-          type: string
-      type: object
-    RerunJob:
-      additionalProperties: true
-      properties:
-        job_name:
-          description: Job name to rerun
-          example: Job Name 1
-          type:
-          - string
-          - 'null'
-        payload:
-          additionalProperties: {}
-          description: Payload to rerun job
-          example:
-            key: value
-          type:
-          - object
-          - 'null'
-        platform_id:
-          description: Platform ID
-          example: 05cfb499-1789-41ac-8653-eb78039b76a2
-          type:
-          - string
-          - 'null'
-      type: object
-    JobId:
-      additionalProperties: true
-      properties:
-        job_id:
-          description: Job ID of the created job
-          example: 05cfb499-1789-41ac-8653-eb78039b76a2
-          type:
-          - string
-          - 'null'
-      type: object
-    HTTPError:
-      properties:
-        detail:
-          type: object
-        error:
-          type: string
-      type: object
-    RerunJobResponse:
-      additionalProperties: true
-      properties:
-        job_id:
           type:
           - string
           - 'null'
@@ -877,6 +857,73 @@ components:
           - string
           - 'null'
       type: object
+    JobAvailabilityResponse:
+      additionalProperties: true
+      properties:
+        max_concurrent_jobs:
+          type:
+          - integer
+          - 'null'
+        max_jobs_in_queue:
+          type:
+          - integer
+          - 'null'
+        max_running_qt_jobs:
+          type:
+          - integer
+          - 'null'
+        num_concurrent_jobs:
+          type:
+          - integer
+          - 'null'
+        num_jobs_in_queue:
+          type:
+          - integer
+          - 'null'
+        num_running_qt_jobs:
+          type:
+          - integer
+          - 'null'
+      type: object
+    ValidationError:
+      properties:
+        detail:
+          properties:
+            <location>:
+              properties:
+                <field_name>:
+                  items:
+                    type: string
+                  type: array
+              type: object
+          type: object
+        message:
+          type: string
+      type: object
+    HTTPError:
+      properties:
+        detail:
+          type: object
+        error:
+          type: string
+      type: object
+    DefaultResponse:
+      additionalProperties: true
+      properties:
+        message:
+          example: ok
+          type:
+          - string
+          - 'null'
+      type: object
+    RerunJobResponse:
+      additionalProperties: true
+      properties:
+        job_id:
+          type:
+          - string
+          - 'null'
+      type: object
     JobCreate:
       additionalProperties: true
       properties:
@@ -932,85 +979,38 @@ components:
       - job_name
       - payload
       type: object
-    JobResult:
+    JobId:
       additionalProperties: true
       properties:
-        duration:
-          description: Duration
-          example: 1
-          type:
-          - integer
-          - 'null'
-        intermediate_results:
-          description: Intermediate Results
-          items:
-            additionalProperties: {}
-            example:
-              key: value
-            type: object
-          type:
-          - array
-          - 'null'
         job_id:
-          description: Job ID
-          example: 5f8b9b0c-4b1c-4b1c-9b0c-4b1c4b1c4b1c
-          type:
-          - string
-          - 'null'
-        results:
-          description: Result as JSON string
-          example: '{"key":"value"}'
-          type:
-          - string
-          - 'null'
-        results_type:
-          description: Job result type
-          example: test
-          type:
-          - string
-          - 'null'
-        shots:
-          description: Number of shots
-          example: 100
-          type:
-          - integer
-          - 'null'
-      type: object
-    DefaultResponse:
-      additionalProperties: true
-      properties:
-        message:
-          example: ok
+          description: Job ID of the created job
+          example: 05cfb499-1789-41ac-8653-eb78039b76a2
           type:
           - string
           - 'null'
       type: object
-    JobAvailabilityResponse:
+    RerunJob:
       additionalProperties: true
       properties:
-        max_concurrent_jobs:
+        job_name:
+          description: Job name to rerun
+          example: Job Name 1
           type:
-          - integer
+          - string
           - 'null'
-        max_jobs_in_queue:
+        payload:
+          additionalProperties: {}
+          description: Payload to rerun job
+          example:
+            key: value
           type:
-          - integer
+          - object
           - 'null'
-        max_running_qt_jobs:
+        platform_id:
+          description: Platform ID
+          example: 05cfb499-1789-41ac-8653-eb78039b76a2
           type:
-          - integer
-          - 'null'
-        num_concurrent_jobs:
-          type:
-          - integer
-          - 'null'
-        num_jobs_in_queue:
-          type:
-          - integer
-          - 'null'
-        num_running_qt_jobs:
-          type:
-          - integer
+          - string
           - 'null'
       type: object
   securitySchemes:
