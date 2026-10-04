@@ -715,6 +715,224 @@ components:
           - integer
           - 'null'
       type: object
+    JobId:
+      additionalProperties: true
+      properties:
+        job_id:
+          description: Job ID of the created job
+          example: 05cfb499-1789-41ac-8653-eb78039b76a2
+          type:
+          - string
+          - 'null'
+      type: object
+    JobCreate:
+      additionalProperties: true
+      properties:
+        job_group_name:
+          description: Job group name to create
+          example: Job Group Name 1
+          type:
+          - string
+          - 'null'
+        job_name:
+          description: Job name to create
+          example: Job Name 1
+          type: string
+        max_duration:
+          description: Max duration of the job in seconds
+          example: 60
+          type:
+          - integer
+          - 'null'
+        payload:
+          additionalProperties: {}
+          description: Payload to create job
+          example:
+            key: value
+          type:
+          - object
+          - 'null'
+        pcvl_version:
+          description: PCVL version, will be passed in `payload`
+          example: 1.0.0
+          type:
+          - string
+          - 'null'
+        platform_id:
+          description: Platform ID
+          example: 05cfb499-1789-41ac-8653-eb78039b76a2
+          type:
+          - string
+          - 'null'
+        platform_name:
+          description: Platform name use when platform_id is not provided
+          example: Platform Name 1
+          type:
+          - string
+          - 'null'
+        process_id:
+          description: Process ID
+          example: 05cfb499-1789-41ac-8653-eb78039b76a2
+          type:
+          - string
+          - 'null'
+      required:
+      - job_name
+      - payload
+      type: object
+    JobStatusResponse:
+      additionalProperties: true
+      properties:
+        creation_datetime:
+          description: Job creation time
+          type:
+          - number
+          - 'null'
+        duration:
+          description: Job duration in seconds
+          example: 60
+          type:
+          - integer
+          - 'null'
+        failure_code:
+          description: Job failure code
+          example: error
+          type:
+          - string
+          - 'null'
+        last_intermediate_results:
+          additionalProperties: {}
+          description: Last intermediate results
+          example:
+            key: value
+          type:
+          - object
+          - 'null'
+        msg:
+          description: Message
+          example: ok
+          type:
+          - string
+          - 'null'
+        progress:
+          description: Job progress in percentage
+          example: 50
+          type:
+          - number
+          - 'null'
+        progress_message:
+          description: Job progress message
+          example: Job is running
+          type:
+          - string
+          - 'null'
+        shots:
+          description: Shots
+          example: 1
+          type:
+          - integer
+          - 'null'
+        start_time:
+          description: Job start time
+          type:
+          - number
+          - 'null'
+        status:
+          description: Job status
+          example: waiting
+          type:
+          - string
+          - 'null'
+        status_message:
+          description: Job status message
+          example: Job is running
+          type:
+          - string
+          - 'null'
+      type: object
+    RerunJob:
+      additionalProperties: true
+      properties:
+        job_name:
+          description: Job name to rerun
+          example: Job Name 1
+          type:
+          - string
+          - 'null'
+        payload:
+          additionalProperties: {}
+          description: Payload to rerun job
+          example:
+            key: value
+          type:
+          - object
+          - 'null'
+        platform_id:
+          description: Platform ID
+          example: 05cfb499-1789-41ac-8653-eb78039b76a2
+          type:
+          - string
+          - 'null'
+      type: object
+    HTTPError:
+      properties:
+        detail:
+          type: object
+        error:
+          type: string
+      type: object
+    DefaultResponse:
+      additionalProperties: true
+      properties:
+        message:
+          example: ok
+          type:
+          - string
+          - 'null'
+      type: object
+    ValidationError:
+      properties:
+        detail:
+          properties:
+            <location>:
+              properties:
+                <field_name>:
+                  items:
+                    type: string
+                  type: array
+              type: object
+          type: object
+        message:
+          type: string
+      type: object
+    JobAvailabilityResponse:
+      additionalProperties: true
+      properties:
+        max_concurrent_jobs:
+          type:
+          - integer
+          - 'null'
+        max_jobs_in_queue:
+          type:
+          - integer
+          - 'null'
+        max_running_qt_jobs:
+          type:
+          - integer
+          - 'null'
+        num_concurrent_jobs:
+          type:
+          - integer
+          - 'null'
+        num_jobs_in_queue:
+          type:
+          - integer
+          - 'null'
+        num_running_qt_jobs:
+          type:
+          - integer
+          - 'null'
+      type: object
     GetJobDataResonse:
       additionalProperties: true
       properties:
@@ -787,228 +1005,10 @@ components:
           - string
           - 'null'
       type: object
-    JobStatusResponse:
-      additionalProperties: true
-      properties:
-        creation_datetime:
-          description: Job creation time
-          type:
-          - number
-          - 'null'
-        duration:
-          description: Job duration in seconds
-          example: 60
-          type:
-          - integer
-          - 'null'
-        failure_code:
-          description: Job failure code
-          example: error
-          type:
-          - string
-          - 'null'
-        last_intermediate_results:
-          additionalProperties: {}
-          description: Last intermediate results
-          example:
-            key: value
-          type:
-          - object
-          - 'null'
-        msg:
-          description: Message
-          example: ok
-          type:
-          - string
-          - 'null'
-        progress:
-          description: Job progress in percentage
-          example: 50
-          type:
-          - number
-          - 'null'
-        progress_message:
-          description: Job progress message
-          example: Job is running
-          type:
-          - string
-          - 'null'
-        shots:
-          description: Shots
-          example: 1
-          type:
-          - integer
-          - 'null'
-        start_time:
-          description: Job start time
-          type:
-          - number
-          - 'null'
-        status:
-          description: Job status
-          example: waiting
-          type:
-          - string
-          - 'null'
-        status_message:
-          description: Job status message
-          example: Job is running
-          type:
-          - string
-          - 'null'
-      type: object
-    JobAvailabilityResponse:
-      additionalProperties: true
-      properties:
-        max_concurrent_jobs:
-          type:
-          - integer
-          - 'null'
-        max_jobs_in_queue:
-          type:
-          - integer
-          - 'null'
-        max_running_qt_jobs:
-          type:
-          - integer
-          - 'null'
-        num_concurrent_jobs:
-          type:
-          - integer
-          - 'null'
-        num_jobs_in_queue:
-          type:
-          - integer
-          - 'null'
-        num_running_qt_jobs:
-          type:
-          - integer
-          - 'null'
-      type: object
-    ValidationError:
-      properties:
-        detail:
-          properties:
-            <location>:
-              properties:
-                <field_name>:
-                  items:
-                    type: string
-                  type: array
-              type: object
-          type: object
-        message:
-          type: string
-      type: object
-    HTTPError:
-      properties:
-        detail:
-          type: object
-        error:
-          type: string
-      type: object
-    DefaultResponse:
-      additionalProperties: true
-      properties:
-        message:
-          example: ok
-          type:
-          - string
-          - 'null'
-      type: object
     RerunJobResponse:
       additionalProperties: true
       properties:
         job_id:
-          type:
-          - string
-          - 'null'
-      type: object
-    JobCreate:
-      additionalProperties: true
-      properties:
-        job_group_name:
-          description: Job group name to create
-          example: Job Group Name 1
-          type:
-          - string
-          - 'null'
-        job_name:
-          description: Job name to create
-          example: Job Name 1
-          type: string
-        max_duration:
-          description: Max duration of the job in seconds
-          example: 60
-          type:
-          - integer
-          - 'null'
-        payload:
-          additionalProperties: {}
-          description: Payload to create job
-          example:
-            key: value
-          type:
-          - object
-          - 'null'
-        pcvl_version:
-          description: PCVL version, will be passed in `payload`
-          example: 1.0.0
-          type:
-          - string
-          - 'null'
-        platform_id:
-          description: Platform ID
-          example: 05cfb499-1789-41ac-8653-eb78039b76a2
-          type:
-          - string
-          - 'null'
-        platform_name:
-          description: Platform name use when platform_id is not provided
-          example: Platform Name 1
-          type:
-          - string
-          - 'null'
-        process_id:
-          description: Process ID
-          example: 05cfb499-1789-41ac-8653-eb78039b76a2
-          type:
-          - string
-          - 'null'
-      required:
-      - job_name
-      - payload
-      type: object
-    JobId:
-      additionalProperties: true
-      properties:
-        job_id:
-          description: Job ID of the created job
-          example: 05cfb499-1789-41ac-8653-eb78039b76a2
-          type:
-          - string
-          - 'null'
-      type: object
-    RerunJob:
-      additionalProperties: true
-      properties:
-        job_name:
-          description: Job name to rerun
-          example: Job Name 1
-          type:
-          - string
-          - 'null'
-        payload:
-          additionalProperties: {}
-          description: Payload to rerun job
-          example:
-            key: value
-          type:
-          - object
-          - 'null'
-        platform_id:
-          description: Platform ID
-          example: 05cfb499-1789-41ac-8653-eb78039b76a2
           type:
           - string
           - 'null'

@@ -849,73 +849,70 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
-    GraphIsomorphismParams:
+    ChemistryVQEJobStatus:
       additionalProperties: false
       properties:
-        algo:
-          description: 'Algorithm to use : Permanental Polynomials or Laplacian PP'
-          enum:
-          - Laplacian PP
-          - PP
+        duration:
+          description: Duration in seconds
+          example: 42
+          type: integer
+        last_intermediate_results:
+          $ref: '#/components/schemas/IntermediateChemistryVqeResults'
+        progress:
+          example: 0.7
+          type: number
+        progress_message:
+          description: detailed message
           type: string
-        epsilon:
-          example: 10
-          type: number
-        error:
-          example: 0.1
-          type: number
-        graph_a:
-          example:
-          - - 0
-            - 1
-          - - 1
-            - 2
-          - - 2
-            - 3
-          - - 2
-            - 4
-          - - 3
-            - 4
-          items: {}
-          minItems: 1
-          type: array
-        graph_b:
-          example:
-          - - 0
-            - 1
-          - - 1
-            - 2
-          - - 2
-            - 3
-          - - 2
-            - 4
-          - - 3
-            - 4
-          items: {}
-          minItems: 1
-          type: array
-        max_iterations:
-          example: 30
-          maximum: 100
-          minimum: 1
-          type: integer
-        nb_samples:
-          example: 10000
-          maximum: 10000000
-          minimum: 1
-          type: integer
-        nb_samples_min_accepted:
-          example: 100
-          maximum: 10000
-          minimum: 1
-          type: integer
-        platform_name:
-          example: sim:gpu:small
+        status:
+          description: Status code
+          enum:
+          - waiting
+          - running
+          - canceled
+          - completed
+          - error
+          example: running
+          type: string
+        status_message:
+          description: detailed message
           type: string
       required:
-      - graph_a
-      - graph_b
-      - platform_name
+      - duration
+      type: object
+    CVarVqeResults:
+      additionalProperties: false
+      properties:
+        bitstring:
+          type: string
+        estimation:
+          $ref: '#/components/schemas/EstimationResult'
+        loss:
+          type: number
+      required:
+      - bitstring
+      - loss
+      type: object
+    ChemistryVqeResults:
+      additionalProperties: false
+      properties:
+        difference_with_theoretical_value:
+          type: number
+        estimation:
+          $ref: '#/components/schemas/EstimationResult'
+        loss:
+          type: number
+      required:
+      - difference_with_theoretical_value
+      - loss
+      type: object
+    GraphIsomorphismResults:
+      additionalProperties: false
+      properties:
+        estimation:
+          $ref: '#/components/schemas/EstimationResult1'
+        is_isomorphic:
+          type: boolean
       type: object
     CVarVQEJobStatus:
       additionalProperties: false
@@ -948,9 +945,93 @@ components:
       required:
       - duration
       type: object
-    IntermediateCustomVqeResults:
+    CustomVQEJobStatus:
       additionalProperties: false
       properties:
+        duration:
+          description: Duration in seconds
+          example: 42
+          type: integer
+        last_intermediate_results:
+          $ref: '#/components/schemas/IntermediateCustomVqeResults'
+        progress:
+          example: 0.7
+          type: number
+        progress_message:
+          description: detailed message
+          type: string
+        status:
+          description: Status code
+          enum:
+          - waiting
+          - running
+          - canceled
+          - completed
+          - error
+          example: running
+          type: string
+        status_message:
+          description: detailed message
+          type: string
+      required:
+      - duration
+      type: object
+    IntermediateGraphDSIResults:
+      additionalProperties: false
+      properties:
+        estimation:
+          $ref: '#/components/schemas/EstimationResult1'
+        subgraphs_density:
+          additionalProperties:
+            type: integer
+          type: object
+        timestamp:
+          type: number
+      type: object
+    CVarVQEJobResult:
+      additionalProperties: false
+      properties:
+        duration:
+          description: Duration in seconds
+          example: 42
+          type: integer
+        intermediate_results:
+          description: Results with timestamps
+          items:
+            $ref: '#/components/schemas/IntermediateCVarVqeResults'
+          type: array
+        job_id:
+          type: string
+        progress:
+          example: 0.7
+          type: number
+        progress_message:
+          description: detailed message
+          type: string
+        results:
+          $ref: '#/components/schemas/CVarVqeResults'
+        status:
+          description: Status code
+          enum:
+          - waiting
+          - running
+          - canceled
+          - completed
+          - error
+          example: running
+          type: string
+        status_message:
+          description: detailed message
+          type: string
+      required:
+      - duration
+      - job_id
+      type: object
+    IntermediateChemistryVqeResults:
+      additionalProperties: false
+      properties:
+        difference_with_theoretical_value:
+          type: number
         estimation:
           $ref: '#/components/schemas/EstimationResult'
         loss:
@@ -958,15 +1039,214 @@ components:
         timestamp:
           type: number
       required:
+      - difference_with_theoretical_value
       - loss
       type: object
-    EstimationResult1:
+    CustomVqeResults:
       additionalProperties: false
       properties:
-        explanation:
-          type: string
-        nb_shots:
+        estimation:
+          $ref: '#/components/schemas/EstimationResult'
+        loss:
+          type: number
+      required:
+      - loss
+      type: object
+    EstimationResult:
+      additionalProperties: false
+      properties:
+        nb_iterations:
           type: integer
+        nb_shots_per_job:
+          type: integer
+        nb_total_shots:
+          type: integer
+      type: object
+    IntermediateCVarVqeResults:
+      additionalProperties: false
+      properties:
+        bitstring:
+          type: string
+        estimation:
+          $ref: '#/components/schemas/EstimationResult'
+        loss:
+          type: number
+        timestamp:
+          type: number
+      required:
+      - bitstring
+      - loss
+      type: object
+    HTTPError:
+      properties:
+        detail:
+          type: object
+        error:
+          type: string
+      type: object
+    ChemistryVqeParams:
+      additionalProperties: false
+      properties:
+        geometry:
+          example:
+          - coordinates:
+            - 0.0
+            - 0.0
+            - 0.0
+            element: Li
+          - coordinates:
+            - 0.0
+            - 0.0
+            - 1.595
+            element: H
+          items:
+            $ref: '#/components/schemas/Atom'
+          minItems: 1
+          type: array
+        max_iterations:
+          default: 200
+          minimum: 1
+          type:
+          - integer
+          - 'null'
+        platform_name:
+          example: sim:gpu:medium
+          type: string
+      required:
+      - geometry
+      - platform_name
+      type: object
+    CustomVQEJobResult:
+      additionalProperties: false
+      properties:
+        duration:
+          description: Duration in seconds
+          example: 42
+          type: integer
+        intermediate_results:
+          description: Results with timestamps
+          items:
+            $ref: '#/components/schemas/IntermediateCustomVqeResults'
+          type: array
+        job_id:
+          type: string
+        progress:
+          example: 0.7
+          type: number
+        progress_message:
+          description: detailed message
+          type: string
+        results:
+          $ref: '#/components/schemas/CustomVqeResults'
+        status:
+          description: Status code
+          enum:
+          - waiting
+          - running
+          - canceled
+          - completed
+          - error
+          example: running
+          type: string
+        status_message:
+          description: detailed message
+          type: string
+      required:
+      - duration
+      - job_id
+      type: object
+    Atom:
+      additionalProperties: false
+      properties:
+        coordinates:
+          items:
+            type: number
+          maxItems: 3
+          minItems: 3
+          type: array
+        element:
+          type: string
+      required:
+      - coordinates
+      - element
+      type: object
+    CustomVqeParams:
+      additionalProperties: false
+      properties:
+        hamiltonian_strings:
+          example:
+          - XIIX
+          - ZZYY
+          - ZXYY
+          - ZZZZ
+          items:
+            type: string
+          minItems: 1
+          type: array
+        hamiltonian_weights:
+          example:
+          - -0.5
+          - 1
+          - 2.44
+          - 5
+          items:
+            type: number
+          minItems: 1
+          type: array
+        max_iterations:
+          default: 200
+          minimum: 1
+          type:
+          - integer
+          - 'null'
+        platform_name:
+          example: sim:gpu:medium
+          type: string
+      required:
+      - hamiltonian_strings
+      - hamiltonian_weights
+      - platform_name
+      type: object
+    GraphIsomorphismJobStatus:
+      additionalProperties: false
+      properties:
+        duration:
+          description: Duration in seconds
+          example: 42
+          type: integer
+        last_intermediate_results:
+          $ref: '#/components/schemas/IntermediateGraphIsomorphismResults'
+        progress:
+          example: 0.7
+          type: number
+        progress_message:
+          description: detailed message
+          type: string
+        status:
+          description: Status code
+          enum:
+          - waiting
+          - running
+          - canceled
+          - completed
+          - error
+          example: running
+          type: string
+        status_message:
+          description: detailed message
+          type: string
+      required:
+      - duration
+      type: object
+    GraphDSIResults:
+      additionalProperties: false
+      properties:
+        estimation:
+          $ref: '#/components/schemas/EstimationResult1'
+        subgraphs_density:
+          additionalProperties:
+            type: integer
+          type: object
       type: object
     GraphIsomorphismJobResult:
       additionalProperties: false
@@ -1006,16 +1286,6 @@ components:
       required:
       - duration
       - job_id
-      type: object
-    CustomVqeResults:
-      additionalProperties: false
-      properties:
-        estimation:
-          $ref: '#/components/schemas/EstimationResult'
-        loss:
-          type: number
-      required:
-      - loss
       type: object
     CVarVqeParams:
       additionalProperties: false
@@ -1441,20 +1711,73 @@ components:
       - platform_name
       - qubo_matrix
       type: object
-    IntermediateCVarVqeResults:
+    GraphIsomorphismParams:
       additionalProperties: false
       properties:
-        bitstring:
+        algo:
+          description: 'Algorithm to use : Permanental Polynomials or Laplacian PP'
+          enum:
+          - Laplacian PP
+          - PP
           type: string
-        estimation:
-          $ref: '#/components/schemas/EstimationResult'
-        loss:
+        epsilon:
+          example: 10
           type: number
-        timestamp:
+        error:
+          example: 0.1
           type: number
+        graph_a:
+          example:
+          - - 0
+            - 1
+          - - 1
+            - 2
+          - - 2
+            - 3
+          - - 2
+            - 4
+          - - 3
+            - 4
+          items: {}
+          minItems: 1
+          type: array
+        graph_b:
+          example:
+          - - 0
+            - 1
+          - - 1
+            - 2
+          - - 2
+            - 3
+          - - 2
+            - 4
+          - - 3
+            - 4
+          items: {}
+          minItems: 1
+          type: array
+        max_iterations:
+          example: 30
+          maximum: 100
+          minimum: 1
+          type: integer
+        nb_samples:
+          example: 10000
+          maximum: 10000000
+          minimum: 1
+          type: integer
+        nb_samples_min_accepted:
+          example: 100
+          maximum: 10000
+          minimum: 1
+          type: integer
+        platform_name:
+          example: sim:gpu:small
+          type: string
       required:
-      - bitstring
-      - loss
+      - graph_a
+      - graph_b
+      - platform_name
       type: object
     QTJobId:
       additionalProperties: false
@@ -1463,202 +1786,6 @@ components:
           type: string
       required:
       - job_id
-      type: object
-    CustomVQEJobResult:
-      additionalProperties: false
-      properties:
-        duration:
-          description: Duration in seconds
-          example: 42
-          type: integer
-        intermediate_results:
-          description: Results with timestamps
-          items:
-            $ref: '#/components/schemas/IntermediateCustomVqeResults'
-          type: array
-        job_id:
-          type: string
-        progress:
-          example: 0.7
-          type: number
-        progress_message:
-          description: detailed message
-          type: string
-        results:
-          $ref: '#/components/schemas/CustomVqeResults'
-        status:
-          description: Status code
-          enum:
-          - waiting
-          - running
-          - canceled
-          - completed
-          - error
-          example: running
-          type: string
-        status_message:
-          description: detailed message
-          type: string
-      required:
-      - duration
-      - job_id
-      type: object
-    ChemistryVqeResults:
-      additionalProperties: false
-      properties:
-        difference_with_theoretical_value:
-          type: number
-        estimation:
-          $ref: '#/components/schemas/EstimationResult'
-        loss:
-          type: number
-      required:
-      - difference_with_theoretical_value
-      - loss
-      type: object
-    ChemistryVQEJobResult:
-      additionalProperties: false
-      properties:
-        duration:
-          description: Duration in seconds
-          example: 42
-          type: integer
-        intermediate_results:
-          description: Results with timestamps
-          items:
-            $ref: '#/components/schemas/IntermediateChemistryVqeResults'
-          type: array
-        job_id:
-          type: string
-        progress:
-          example: 0.7
-          type: number
-        progress_message:
-          description: detailed message
-          type: string
-        results:
-          $ref: '#/components/schemas/ChemistryVqeResults'
-        status:
-          description: Status code
-          enum:
-          - waiting
-          - running
-          - canceled
-          - completed
-          - error
-          example: running
-          type: string
-        status_message:
-          description: detailed message
-          type: string
-      required:
-      - duration
-      - job_id
-      type: object
-    CVarVQEJobResult:
-      additionalProperties: false
-      properties:
-        duration:
-          description: Duration in seconds
-          example: 42
-          type: integer
-        intermediate_results:
-          description: Results with timestamps
-          items:
-            $ref: '#/components/schemas/IntermediateCVarVqeResults'
-          type: array
-        job_id:
-          type: string
-        progress:
-          example: 0.7
-          type: number
-        progress_message:
-          description: detailed message
-          type: string
-        results:
-          $ref: '#/components/schemas/CVarVqeResults'
-        status:
-          description: Status code
-          enum:
-          - waiting
-          - running
-          - canceled
-          - completed
-          - error
-          example: running
-          type: string
-        status_message:
-          description: detailed message
-          type: string
-      required:
-      - duration
-      - job_id
-      type: object
-    ValidationError:
-      properties:
-        detail:
-          properties:
-            <location>:
-              properties:
-                <field_name>:
-                  items:
-                    type: string
-                  type: array
-              type: object
-          type: object
-        message:
-          type: string
-      type: object
-    IntermediateGraphIsomorphismResults:
-      additionalProperties: false
-      properties:
-        estimation:
-          $ref: '#/components/schemas/EstimationResult1'
-        is_isomorphic:
-          type: boolean
-        timestamp:
-          type: number
-      type: object
-    GraphDSIJobStatus:
-      additionalProperties: false
-      properties:
-        duration:
-          description: Duration in seconds
-          example: 42
-          type: integer
-        last_intermediate_results:
-          $ref: '#/components/schemas/IntermediateGraphDSIResults'
-        progress:
-          example: 0.7
-          type: number
-        progress_message:
-          description: detailed message
-          type: string
-        status:
-          description: Status code
-          enum:
-          - waiting
-          - running
-          - canceled
-          - completed
-          - error
-          example: running
-          type: string
-        status_message:
-          description: detailed message
-          type: string
-      required:
-      - duration
-      type: object
-    GraphDSIResults:
-      additionalProperties: false
-      properties:
-        estimation:
-          $ref: '#/components/schemas/EstimationResult1'
-        subgraphs_density:
-          additionalProperties:
-            type: integer
-          type: object
       type: object
     GraphDSIParams:
       additionalProperties: false
@@ -1712,176 +1839,6 @@ components:
       - seed
       - size_subgraph
       type: object
-    IntermediateGraphDSIResults:
-      additionalProperties: false
-      properties:
-        estimation:
-          $ref: '#/components/schemas/EstimationResult1'
-        subgraphs_density:
-          additionalProperties:
-            type: integer
-          type: object
-        timestamp:
-          type: number
-      type: object
-    ChemistryVqeParams:
-      additionalProperties: false
-      properties:
-        geometry:
-          example:
-          - coordinates:
-            - 0.0
-            - 0.0
-            - 0.0
-            element: Li
-          - coordinates:
-            - 0.0
-            - 0.0
-            - 1.595
-            element: H
-          items:
-            $ref: '#/components/schemas/Atom'
-          minItems: 1
-          type: array
-        max_iterations:
-          default: 200
-          minimum: 1
-          type:
-          - integer
-          - 'null'
-        platform_name:
-          example: sim:gpu:medium
-          type: string
-      required:
-      - geometry
-      - platform_name
-      type: object
-    HTTPError:
-      properties:
-        detail:
-          type: object
-        error:
-          type: string
-      type: object
-    GraphIsomorphismJobStatus:
-      additionalProperties: false
-      properties:
-        duration:
-          description: Duration in seconds
-          example: 42
-          type: integer
-        last_intermediate_results:
-          $ref: '#/components/schemas/IntermediateGraphIsomorphismResults'
-        progress:
-          example: 0.7
-          type: number
-        progress_message:
-          description: detailed message
-          type: string
-        status:
-          description: Status code
-          enum:
-          - waiting
-          - running
-          - canceled
-          - completed
-          - error
-          example: running
-          type: string
-        status_message:
-          description: detailed message
-          type: string
-      required:
-      - duration
-      type: object
-    Atom:
-      additionalProperties: false
-      properties:
-        coordinates:
-          items:
-            type: number
-          maxItems: 3
-          minItems: 3
-          type: array
-        element:
-          type: string
-      required:
-      - coordinates
-      - element
-      type: object
-    CVarVqeResults:
-      additionalProperties: false
-      properties:
-        bitstring:
-          type: string
-        estimation:
-          $ref: '#/components/schemas/EstimationResult'
-        loss:
-          type: number
-      required:
-      - bitstring
-      - loss
-      type: object
-    IntermediateChemistryVqeResults:
-      additionalProperties: false
-      properties:
-        difference_with_theoretical_value:
-          type: number
-        estimation:
-          $ref: '#/components/schemas/EstimationResult'
-        loss:
-          type: number
-        timestamp:
-          type: number
-      required:
-      - difference_with_theoretical_value
-      - loss
-      type: object
-    GraphIsomorphismResults:
-      additionalProperties: false
-      properties:
-        estimation:
-          $ref: '#/components/schemas/EstimationResult1'
-        is_isomorphic:
-          type: boolean
-      type: object
-    CustomVqeParams:
-      additionalProperties: false
-      properties:
-        hamiltonian_strings:
-          example:
-          - XIIX
-          - ZZYY
-          - ZXYY
-          - ZZZZ
-          items:
-            type: string
-          minItems: 1
-          type: array
-        hamiltonian_weights:
-          example:
-          - -0.5
-          - 1
-          - 2.44
-          - 5
-          items:
-            type: number
-          minItems: 1
-          type: array
-        max_iterations:
-          default: 200
-          minimum: 1
-          type:
-          - integer
-          - 'null'
-        platform_name:
-          example: sim:gpu:medium
-          type: string
-      required:
-      - hamiltonian_strings
-      - hamiltonian_weights
-      - platform_name
-      type: object
     GraphDSIJobResult:
       additionalProperties: false
       properties:
@@ -1921,7 +1878,91 @@ components:
       - duration
       - job_id
       type: object
-    ChemistryVQEJobStatus:
+    IntermediateGraphIsomorphismResults:
+      additionalProperties: false
+      properties:
+        estimation:
+          $ref: '#/components/schemas/EstimationResult1'
+        is_isomorphic:
+          type: boolean
+        timestamp:
+          type: number
+      type: object
+    EstimationResult1:
+      additionalProperties: false
+      properties:
+        explanation:
+          type: string
+        nb_shots:
+          type: integer
+      type: object
+    IntermediateCustomVqeResults:
+      additionalProperties: false
+      properties:
+        estimation:
+          $ref: '#/components/schemas/EstimationResult'
+        loss:
+          type: number
+        timestamp:
+          type: number
+      required:
+      - loss
+      type: object
+    ChemistryVQEJobResult:
+      additionalProperties: false
+      properties:
+        duration:
+          description: Duration in seconds
+          example: 42
+          type: integer
+        intermediate_results:
+          description: Results with timestamps
+          items:
+            $ref: '#/components/schemas/IntermediateChemistryVqeResults'
+          type: array
+        job_id:
+          type: string
+        progress:
+          example: 0.7
+          type: number
+        progress_message:
+          description: detailed message
+          type: string
+        results:
+          $ref: '#/components/schemas/ChemistryVqeResults'
+        status:
+          description: Status code
+          enum:
+          - waiting
+          - running
+          - canceled
+          - completed
+          - error
+          example: running
+          type: string
+        status_message:
+          description: detailed message
+          type: string
+      required:
+      - duration
+      - job_id
+      type: object
+    ValidationError:
+      properties:
+        detail:
+          properties:
+            <location>:
+              properties:
+                <field_name>:
+                  items:
+                    type: string
+                  type: array
+              type: object
+          type: object
+        message:
+          type: string
+      type: object
+    GraphDSIJobStatus:
       additionalProperties: false
       properties:
         duration:
@@ -1929,7 +1970,7 @@ components:
           example: 42
           type: integer
         last_intermediate_results:
-          $ref: '#/components/schemas/IntermediateChemistryVqeResults'
+          $ref: '#/components/schemas/IntermediateGraphDSIResults'
         progress:
           example: 0.7
           type: number
@@ -1951,47 +1992,6 @@ components:
           type: string
       required:
       - duration
-      type: object
-    CustomVQEJobStatus:
-      additionalProperties: false
-      properties:
-        duration:
-          description: Duration in seconds
-          example: 42
-          type: integer
-        last_intermediate_results:
-          $ref: '#/components/schemas/IntermediateCustomVqeResults'
-        progress:
-          example: 0.7
-          type: number
-        progress_message:
-          description: detailed message
-          type: string
-        status:
-          description: Status code
-          enum:
-          - waiting
-          - running
-          - canceled
-          - completed
-          - error
-          example: running
-          type: string
-        status_message:
-          description: detailed message
-          type: string
-      required:
-      - duration
-      type: object
-    EstimationResult:
-      additionalProperties: false
-      properties:
-        nb_iterations:
-          type: integer
-        nb_shots_per_job:
-          type: integer
-        nb_total_shots:
-          type: integer
       type: object
   securitySchemes:
     BearerAuth:

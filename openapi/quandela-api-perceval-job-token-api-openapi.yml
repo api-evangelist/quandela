@@ -692,6 +692,45 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
+    DeleteTokensByKey:
+      additionalProperties: true
+      properties:
+        tokens:
+          items:
+            type: string
+          type:
+          - array
+          - 'null'
+      type: object
+    TokenUsageUnit:
+      additionalProperties: true
+      properties:
+        credits:
+          description: Total credits consumed on this platform
+          type:
+          - number
+          - 'null'
+        duration_seconds:
+          description: Total execution time on this platform, measured in seconds
+          type:
+          - integer
+          - 'null'
+        free_credits:
+          description: Total free credits consumed on this platform
+          type:
+          - number
+          - 'null'
+        nb_jobs:
+          description: Number of jobs executed on this platform
+          type:
+          - integer
+          - 'null'
+        platform_name:
+          description: Platform identifier where the token was used (e.g. qpu:belenos, sim:gpu)
+          type:
+          - string
+          - 'null'
+      type: object
     RevokeToken:
       additionalProperties: true
       properties:
@@ -701,14 +740,125 @@ components:
       required:
       - token
       type: object
-    DeleteTokensByKey:
+    ListTokenIds:
       additionalProperties: true
       properties:
-        tokens:
+        token_ids:
           items:
-            type: string
+            type: integer
+          type: array
+      required:
+      - token_ids
+      type: object
+    TokenGenerateResponse:
+      additionalProperties: true
+      properties:
+        duration:
+          description: Duration of access token in seconds
+          example: 3600
           type:
-          - array
+          - integer
+          - 'null'
+        token:
+          description: Access token for authentication
+          example: _T_eyJhbGciOiJIUzUxMiIsImlhdCI6MTY3MTg0ODU0NSwiZXhwIjoxNjc0NDQwNTQ1fQ.eyJpZCI6NDl9.M4UuwDLw2BrATJPpzoAvFw7Z84BttKaWGPHgSmMO9xGi3E84q4JRzwze5PcNrAZXaNWo1tCshWTQxYBN1Sxorw
+          type:
+          - string
+          - 'null'
+        token_id:
+          type:
+          - integer
+          - 'null'
+      type: object
+    TokensListUnitResponse:
+      additionalProperties: true
+      properties:
+        count:
+          type:
+          - integer
+          - 'null'
+        created_date:
+          format: date-time
+          type:
+          - string
+          - 'null'
+        expiration_date:
+          format: date-time
+          type:
+          - string
+          - 'null'
+        id:
+          type:
+          - integer
+          - 'null'
+        is_revoked:
+          type:
+          - boolean
+          - 'null'
+        key:
+          type:
+          - string
+          - 'null'
+        label:
+          type:
+          - string
+          - 'null'
+        last_used_time:
+          format: date-time
+          type:
+          - string
+          - 'null'
+        priority:
+          type:
+          - integer
+          - 'null'
+        user_id:
+          type:
+          - integer
+          - 'null'
+      type: object
+    TokenGenerateRequest:
+      additionalProperties: true
+      properties:
+        duration:
+          default: 86400
+          description: Duration of access token in seconds
+          example: 86400
+          type:
+          - integer
+          - 'null'
+        is_explorer_token:
+          type:
+          - boolean
+          - 'null'
+        label:
+          default: unknown
+          description: Label of the token
+          example: unknown
+          type:
+          - string
+          - 'null'
+        priority:
+          default: 0
+          description: Number presenting the priority, must be lower than the user's priority, default is 0
+          example: 1
+          type:
+          - integer
+          - 'null'
+        user_id:
+          description: ID of the User, default is id of current user
+          example: 1
+          type:
+          - integer
+          - 'null'
+      type: object
+    DefaultResponse:
+      additionalProperties: true
+      properties:
+        message:
+          example: ok
+          type:
+          - string
           - 'null'
       type: object
     TokenUsageResponse:
@@ -730,6 +880,45 @@ components:
             $ref: '#/components/schemas/TokenUsageUnit'
           type:
           - array
+          - 'null'
+      type: object
+    HTTPError:
+      properties:
+        detail:
+          type: object
+        error:
+          type: string
+      type: object
+    ValidationError:
+      properties:
+        detail:
+          properties:
+            <location>:
+              properties:
+                <field_name>:
+                  items:
+                    type: string
+                  type: array
+              type: object
+          type: object
+        message:
+          type: string
+      type: object
+    TokenUpdate:
+      additionalProperties: true
+      properties:
+        label:
+          default: unknown
+          description: Label of the token
+          example: unknown
+          type:
+          - string
+          - 'null'
+        priority:
+          description: Number presenting the priority, must be lower than the user's priority, default is 0
+          example: 1
+          type:
+          - integer
           - 'null'
       type: object
     Token:
@@ -835,195 +1024,6 @@ components:
           example: true
           type:
           - boolean
-          - 'null'
-      type: object
-    TokenGenerateResponse:
-      additionalProperties: true
-      properties:
-        duration:
-          description: Duration of access token in seconds
-          example: 3600
-          type:
-          - integer
-          - 'null'
-        token:
-          description: Access token for authentication
-          example: _T_eyJhbGciOiJIUzUxMiIsImlhdCI6MTY3MTg0ODU0NSwiZXhwIjoxNjc0NDQwNTQ1fQ.eyJpZCI6NDl9.M4UuwDLw2BrATJPpzoAvFw7Z84BttKaWGPHgSmMO9xGi3E84q4JRzwze5PcNrAZXaNWo1tCshWTQxYBN1Sxorw
-          type:
-          - string
-          - 'null'
-        token_id:
-          type:
-          - integer
-          - 'null'
-      type: object
-    ListTokenIds:
-      additionalProperties: true
-      properties:
-        token_ids:
-          items:
-            type: integer
-          type: array
-      required:
-      - token_ids
-      type: object
-    TokensListUnitResponse:
-      additionalProperties: true
-      properties:
-        count:
-          type:
-          - integer
-          - 'null'
-        created_date:
-          format: date-time
-          type:
-          - string
-          - 'null'
-        expiration_date:
-          format: date-time
-          type:
-          - string
-          - 'null'
-        id:
-          type:
-          - integer
-          - 'null'
-        is_revoked:
-          type:
-          - boolean
-          - 'null'
-        key:
-          type:
-          - string
-          - 'null'
-        label:
-          type:
-          - string
-          - 'null'
-        last_used_time:
-          format: date-time
-          type:
-          - string
-          - 'null'
-        priority:
-          type:
-          - integer
-          - 'null'
-        user_id:
-          type:
-          - integer
-          - 'null'
-      type: object
-    TokenUsageUnit:
-      additionalProperties: true
-      properties:
-        credits:
-          description: Total credits consumed on this platform
-          type:
-          - number
-          - 'null'
-        duration_seconds:
-          description: Total execution time on this platform, measured in seconds
-          type:
-          - integer
-          - 'null'
-        free_credits:
-          description: Total free credits consumed on this platform
-          type:
-          - number
-          - 'null'
-        nb_jobs:
-          description: Number of jobs executed on this platform
-          type:
-          - integer
-          - 'null'
-        platform_name:
-          description: Platform identifier where the token was used (e.g. qpu:belenos, sim:gpu)
-          type:
-          - string
-          - 'null'
-      type: object
-    TokenUpdate:
-      additionalProperties: true
-      properties:
-        label:
-          default: unknown
-          description: Label of the token
-          example: unknown
-          type:
-          - string
-          - 'null'
-        priority:
-          description: Number presenting the priority, must be lower than the user's priority, default is 0
-          example: 1
-          type:
-          - integer
-          - 'null'
-      type: object
-    HTTPError:
-      properties:
-        detail:
-          type: object
-        error:
-          type: string
-      type: object
-    ValidationError:
-      properties:
-        detail:
-          properties:
-            <location>:
-              properties:
-                <field_name>:
-                  items:
-                    type: string
-                  type: array
-              type: object
-          type: object
-        message:
-          type: string
-      type: object
-    TokenGenerateRequest:
-      additionalProperties: true
-      properties:
-        duration:
-          default: 86400
-          description: Duration of access token in seconds
-          example: 86400
-          type:
-          - integer
-          - 'null'
-        is_explorer_token:
-          type:
-          - boolean
-          - 'null'
-        label:
-          default: unknown
-          description: Label of the token
-          example: unknown
-          type:
-          - string
-          - 'null'
-        priority:
-          default: 0
-          description: Number presenting the priority, must be lower than the user's priority, default is 0
-          example: 1
-          type:
-          - integer
-          - 'null'
-        user_id:
-          description: ID of the User, default is id of current user
-          example: 1
-          type:
-          - integer
-          - 'null'
-      type: object
-    DefaultResponse:
-      additionalProperties: true
-      properties:
-        message:
-          example: ok
-          type:
-          - string
           - 'null'
       type: object
   securitySchemes:
