@@ -671,115 +671,6 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
-    JobResult:
-      additionalProperties: true
-      properties:
-        duration:
-          description: Duration
-          example: 1
-          type:
-          - integer
-          - 'null'
-        intermediate_results:
-          description: Intermediate Results
-          items:
-            additionalProperties: {}
-            example:
-              key: value
-            type: object
-          type:
-          - array
-          - 'null'
-        job_id:
-          description: Job ID
-          example: 5f8b9b0c-4b1c-4b1c-9b0c-4b1c4b1c4b1c
-          type:
-          - string
-          - 'null'
-        results:
-          description: Result as JSON string
-          example: '{"key":"value"}'
-          type:
-          - string
-          - 'null'
-        results_type:
-          description: Job result type
-          example: test
-          type:
-          - string
-          - 'null'
-        shots:
-          description: Number of shots
-          example: 100
-          type:
-          - integer
-          - 'null'
-      type: object
-    JobId:
-      additionalProperties: true
-      properties:
-        job_id:
-          description: Job ID of the created job
-          example: 05cfb499-1789-41ac-8653-eb78039b76a2
-          type:
-          - string
-          - 'null'
-      type: object
-    JobCreate:
-      additionalProperties: true
-      properties:
-        job_group_name:
-          description: Job group name to create
-          example: Job Group Name 1
-          type:
-          - string
-          - 'null'
-        job_name:
-          description: Job name to create
-          example: Job Name 1
-          type: string
-        max_duration:
-          description: Max duration of the job in seconds
-          example: 60
-          type:
-          - integer
-          - 'null'
-        payload:
-          additionalProperties: {}
-          description: Payload to create job
-          example:
-            key: value
-          type:
-          - object
-          - 'null'
-        pcvl_version:
-          description: PCVL version, will be passed in `payload`
-          example: 1.0.0
-          type:
-          - string
-          - 'null'
-        platform_id:
-          description: Platform ID
-          example: 05cfb499-1789-41ac-8653-eb78039b76a2
-          type:
-          - string
-          - 'null'
-        platform_name:
-          description: Platform name use when platform_id is not provided
-          example: Platform Name 1
-          type:
-          - string
-          - 'null'
-        process_id:
-          description: Process ID
-          example: 05cfb499-1789-41ac-8653-eb78039b76a2
-          type:
-          - string
-          - 'null'
-      required:
-      - job_name
-      - payload
-      type: object
     JobStatusResponse:
       additionalProperties: true
       properties:
@@ -850,6 +741,22 @@ components:
           - string
           - 'null'
       type: object
+    HTTPError:
+      properties:
+        detail:
+          type: object
+        error:
+          type: string
+      type: object
+    DefaultResponse:
+      additionalProperties: true
+      properties:
+        message:
+          example: ok
+          type:
+          - string
+          - 'null'
+      type: object
     RerunJob:
       additionalProperties: true
       properties:
@@ -874,18 +781,109 @@ components:
           - string
           - 'null'
       type: object
-    HTTPError:
-      properties:
-        detail:
-          type: object
-        error:
-          type: string
-      type: object
-    DefaultResponse:
+    JobCreate:
       additionalProperties: true
       properties:
-        message:
-          example: ok
+        job_group_name:
+          description: Job group name to create
+          example: Job Group Name 1
+          type:
+          - string
+          - 'null'
+        job_name:
+          description: Job name to create
+          example: Job Name 1
+          type: string
+        max_duration:
+          description: Max duration of the job in seconds
+          example: 60
+          type:
+          - integer
+          - 'null'
+        payload:
+          additionalProperties: {}
+          description: Payload to create job
+          example:
+            key: value
+          type:
+          - object
+          - 'null'
+        pcvl_version:
+          description: PCVL version, will be passed in `payload`
+          example: 1.0.0
+          type:
+          - string
+          - 'null'
+        platform_id:
+          description: Platform ID
+          example: 05cfb499-1789-41ac-8653-eb78039b76a2
+          type:
+          - string
+          - 'null'
+        platform_name:
+          description: Platform name use when platform_id is not provided
+          example: Platform Name 1
+          type:
+          - string
+          - 'null'
+        process_id:
+          description: Process ID
+          example: 05cfb499-1789-41ac-8653-eb78039b76a2
+          type:
+          - string
+          - 'null'
+      required:
+      - job_name
+      - payload
+      type: object
+    JobResult:
+      additionalProperties: true
+      properties:
+        duration:
+          description: Duration
+          example: 1
+          type:
+          - integer
+          - 'null'
+        intermediate_results:
+          description: Intermediate Results
+          items:
+            additionalProperties: {}
+            example:
+              key: value
+            type: object
+          type:
+          - array
+          - 'null'
+        job_id:
+          description: Job ID
+          example: 5f8b9b0c-4b1c-4b1c-9b0c-4b1c4b1c4b1c
+          type:
+          - string
+          - 'null'
+        results:
+          description: Result as JSON string
+          example: '{"key":"value"}'
+          type:
+          - string
+          - 'null'
+        results_type:
+          description: Job result type
+          example: test
+          type:
+          - string
+          - 'null'
+        shots:
+          description: Number of shots
+          example: 100
+          type:
+          - integer
+          - 'null'
+      type: object
+    RerunJobResponse:
+      additionalProperties: true
+      properties:
+        job_id:
           type:
           - string
           - 'null'
@@ -904,6 +902,16 @@ components:
           type: object
         message:
           type: string
+      type: object
+    JobId:
+      additionalProperties: true
+      properties:
+        job_id:
+          description: Job ID of the created job
+          example: 05cfb499-1789-41ac-8653-eb78039b76a2
+          type:
+          - string
+          - 'null'
       type: object
     JobAvailabilityResponse:
       additionalProperties: true
@@ -1001,14 +1009,6 @@ components:
           - integer
           - 'null'
         token_label:
-          type:
-          - string
-          - 'null'
-      type: object
-    RerunJobResponse:
-      additionalProperties: true
-      properties:
-        job_id:
           type:
           - string
           - 'null'

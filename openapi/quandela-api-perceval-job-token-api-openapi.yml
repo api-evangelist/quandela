@@ -692,16 +692,6 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
-    DeleteTokensByKey:
-      additionalProperties: true
-      properties:
-        tokens:
-          items:
-            type: string
-          type:
-          - array
-          - 'null'
-      type: object
     TokenUsageUnit:
       additionalProperties: true
       properties:
@@ -729,92 +719,6 @@ components:
           description: Platform identifier where the token was used (e.g. qpu:belenos, sim:gpu)
           type:
           - string
-          - 'null'
-      type: object
-    RevokeToken:
-      additionalProperties: true
-      properties:
-        token:
-          example: _T_eyJhbGciOiJIUzUxMiIsImlhdCI6MTY3MTg0ODU0NSwiZXhwIjoxNjc0NDQwNT
-          type: string
-      required:
-      - token
-      type: object
-    ListTokenIds:
-      additionalProperties: true
-      properties:
-        token_ids:
-          items:
-            type: integer
-          type: array
-      required:
-      - token_ids
-      type: object
-    TokenGenerateResponse:
-      additionalProperties: true
-      properties:
-        duration:
-          description: Duration of access token in seconds
-          example: 3600
-          type:
-          - integer
-          - 'null'
-        token:
-          description: Access token for authentication
-          example: _T_eyJhbGciOiJIUzUxMiIsImlhdCI6MTY3MTg0ODU0NSwiZXhwIjoxNjc0NDQwNTQ1fQ.eyJpZCI6NDl9.M4UuwDLw2BrATJPpzoAvFw7Z84BttKaWGPHgSmMO9xGi3E84q4JRzwze5PcNrAZXaNWo1tCshWTQxYBN1Sxorw
-          type:
-          - string
-          - 'null'
-        token_id:
-          type:
-          - integer
-          - 'null'
-      type: object
-    TokensListUnitResponse:
-      additionalProperties: true
-      properties:
-        count:
-          type:
-          - integer
-          - 'null'
-        created_date:
-          format: date-time
-          type:
-          - string
-          - 'null'
-        expiration_date:
-          format: date-time
-          type:
-          - string
-          - 'null'
-        id:
-          type:
-          - integer
-          - 'null'
-        is_revoked:
-          type:
-          - boolean
-          - 'null'
-        key:
-          type:
-          - string
-          - 'null'
-        label:
-          type:
-          - string
-          - 'null'
-        last_used_time:
-          format: date-time
-          type:
-          - string
-          - 'null'
-        priority:
-          type:
-          - integer
-          - 'null'
-        user_id:
-          type:
-          - integer
           - 'null'
       type: object
     TokenGenerateRequest:
@@ -852,6 +756,23 @@ components:
           - integer
           - 'null'
       type: object
+    HTTPError:
+      properties:
+        detail:
+          type: object
+        error:
+          type: string
+      type: object
+    DeleteTokensByKey:
+      additionalProperties: true
+      properties:
+        tokens:
+          items:
+            type: string
+          type:
+          - array
+          - 'null'
+      type: object
     DefaultResponse:
       additionalProperties: true
       properties:
@@ -881,28 +802,6 @@ components:
           type:
           - array
           - 'null'
-      type: object
-    HTTPError:
-      properties:
-        detail:
-          type: object
-        error:
-          type: string
-      type: object
-    ValidationError:
-      properties:
-        detail:
-          properties:
-            <location>:
-              properties:
-                <field_name>:
-                  items:
-                    type: string
-                  type: array
-              type: object
-          type: object
-        message:
-          type: string
       type: object
     TokenUpdate:
       additionalProperties: true
@@ -1024,6 +923,107 @@ components:
           example: true
           type:
           - boolean
+          - 'null'
+      type: object
+    RevokeToken:
+      additionalProperties: true
+      properties:
+        token:
+          example: _T_eyJhbGciOiJIUzUxMiIsImlhdCI6MTY3MTg0ODU0NSwiZXhwIjoxNjc0NDQwNT
+          type: string
+      required:
+      - token
+      type: object
+    ValidationError:
+      properties:
+        detail:
+          properties:
+            <location>:
+              properties:
+                <field_name>:
+                  items:
+                    type: string
+                  type: array
+              type: object
+          type: object
+        message:
+          type: string
+      type: object
+    TokenGenerateResponse:
+      additionalProperties: true
+      properties:
+        duration:
+          description: Duration of access token in seconds
+          example: 3600
+          type:
+          - integer
+          - 'null'
+        token:
+          description: Access token for authentication
+          example: _T_eyJhbGciOiJIUzUxMiIsImlhdCI6MTY3MTg0ODU0NSwiZXhwIjoxNjc0NDQwNTQ1fQ.eyJpZCI6NDl9.M4UuwDLw2BrATJPpzoAvFw7Z84BttKaWGPHgSmMO9xGi3E84q4JRzwze5PcNrAZXaNWo1tCshWTQxYBN1Sxorw
+          type:
+          - string
+          - 'null'
+        token_id:
+          type:
+          - integer
+          - 'null'
+      type: object
+    ListTokenIds:
+      additionalProperties: true
+      properties:
+        token_ids:
+          items:
+            type: integer
+          type: array
+      required:
+      - token_ids
+      type: object
+    TokensListUnitResponse:
+      additionalProperties: true
+      properties:
+        count:
+          type:
+          - integer
+          - 'null'
+        created_date:
+          format: date-time
+          type:
+          - string
+          - 'null'
+        expiration_date:
+          format: date-time
+          type:
+          - string
+          - 'null'
+        id:
+          type:
+          - integer
+          - 'null'
+        is_revoked:
+          type:
+          - boolean
+          - 'null'
+        key:
+          type:
+          - string
+          - 'null'
+        label:
+          type:
+          - string
+          - 'null'
+        last_used_time:
+          format: date-time
+          type:
+          - string
+          - 'null'
+        priority:
+          type:
+          - integer
+          - 'null'
+        user_id:
+          type:
+          - integer
           - 'null'
       type: object
   securitySchemes:

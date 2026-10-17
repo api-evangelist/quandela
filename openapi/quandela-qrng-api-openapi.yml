@@ -134,6 +134,24 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
+    QrngBytesOutput:
+      additionalProperties: false
+      properties:
+        jobs:
+          description: Jobs used to generate random bytes
+          items:
+            $ref: '#/components/schemas/JobBytes'
+          type: array
+      required:
+      - jobs
+      type: object
+    HTTPError:
+      properties:
+        detail:
+          type: object
+        error:
+          type: string
+      type: object
     QrngIntsOutput:
       additionalProperties: false
       properties:
@@ -145,11 +163,19 @@ components:
       required:
       - jobs
       type: object
-    HTTPError:
+    ValidationError:
       properties:
         detail:
+          properties:
+            <location>:
+              properties:
+                <field_name>:
+                  items:
+                    type: string
+                  type: array
+              type: object
           type: object
-        error:
+        message:
           type: string
       type: object
     JobBytes:
@@ -170,32 +196,6 @@ components:
       - chsh
       - id
       - min_entropy
-      type: object
-    ValidationError:
-      properties:
-        detail:
-          properties:
-            <location>:
-              properties:
-                <field_name>:
-                  items:
-                    type: string
-                  type: array
-              type: object
-          type: object
-        message:
-          type: string
-      type: object
-    QrngBytesOutput:
-      additionalProperties: false
-      properties:
-        jobs:
-          description: Jobs used to generate random bytes
-          items:
-            $ref: '#/components/schemas/JobBytes'
-          type: array
-      required:
-      - jobs
       type: object
     JobInts:
       additionalProperties: false
