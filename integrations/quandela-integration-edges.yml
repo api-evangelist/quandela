@@ -29,6 +29,31 @@ edges:
     detected: '2026-10-18'
   detected_by: sweep-official-sdks.py
   first_seen: '2026-10-18'
+- partner_name: QED-C (Quantum Economic Development Consortium)
+  partner: null
+  partner_match: register
+  type: register
+  channel: standard-directory
+  relationship: standard-participant
+  direction: partner-built
+  evidence: https://quantumconsortium.org/members/
+  category: quantum industry consortium
+  contract_reference:
+    register: QED-C members (quantumconsortium.org/members, Corporate)
+    standard: null
+    spec_file: null
+    role: qedc-member
+    registered_name: Quandela
+    register_id: https://quantumconsortium.org/members/
+    member_class: Corporate
+    founding_member: false
+    matched_domain: quandela.com
+    matched_by: domain
+    signal_note: 'participation only: consortium membership; founding status is context, never counted'
+    detected_by: sweep-quantum-computing.py
+    detected: '2026-10-20'
+  detected_by: sweep-quantum-computing.py
+  first_seen: '2026-10-20'
 generated: '2026-10-18'
 method: searched
 source:
@@ -47,3 +72,4 @@ checked:
 - https://registry.npmjs.org
 - https://repo1.maven.org/maven2
 - https://rubygems.org/api/v1
+- https://quantumconsortium.org/members/
